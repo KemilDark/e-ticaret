@@ -5,93 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      background-color: #1f2937;
-      color: #ffffff;
-      border-radius: 0.375rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 10;
-      min-width: 200px;
-      margin-top: 0.5rem;
-    }
-    .dropdown-menu a:hover {
-      background-color: #374151;
-    }
-  </style>
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-auth.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
+      authDomain: "e-ticaret-74b1c.firebaseapp.com",
+      projectId: "e-ticaret-74b1c",
+      storageBucket: "e-ticaret-74b1c.firebasestorage.app",
+      messagingSenderId: "547307588836",
+      appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
+      measurementId: "G-GTL1NTV1G1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Check user authentication state
+    onAuthStateChanged(auth, (user) => {
+      const authSection = document.getElementById("auth-section");
+      const welcomeSection = document.getElementById("welcome-section");
+      const userEmail = document.getElementById("user-email");
+      if (user) {
+        authSection.classList.add("hidden");
+        welcomeSection.classList.remove("hidden");
+        userEmail.textContent = user.email;
+      } else {
+        authSection.classList.remove("hidden");
+        welcomeSection.classList.add("hidden");
+      }
+    });
+
+    // Register user
+    window.registerUser = function() {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Kayıt başarılı!"))
+        .catch((error) => alert("Kayıt hatası: " + error.message));
+    };
+
+    // Login user
+    window.loginUser = function() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Giriş başarılı!"))
+        .catch((error) => alert("Giriş hatası: " + error.message));
+    };
+
+    // Logout user
+    window.logoutUser = function() {
+      signOut(auth)
+        .then(() => alert("Çıkış yapıldı."))
+        .catch((error) => alert("Çıkış hatası: " + error.message));
+    };
+  </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
-  <!-- Navbar -->
-  <nav class="bg-gray-900 text-gray-100 p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <!-- Logo -->
-      <div class="flex items-center">
-        <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain">
-      </div>
-      <!-- Hamburger Menu Button -->
-      <button id="hamburger-btn" class="md:hidden text-white focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-    </div>
-    <div id="mobile-menu" class="hidden bg-gray-800 text-white p-4 mt-2 rounded">
-      <a href="#home" class="block px-4 py-2 hover:bg-gray-700" onclick="showHome()">Ana Sayfa</a>
-      <a href="#login" class="block px-4 py-2 hover:bg-gray-700" onclick="showLogin()">Giriş Yap</a>
-      <a href="#cart" class="block px-4 py-2 hover:bg-gray-700" onclick="showCart()">Sepet</a>
-    </div>
+  <nav class="bg-gray-900 text-gray-100 p-4 flex justify-between items-center">
+    <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain">
+    <button id="hamburger-btn" class="md:hidden focus:outline-none text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
   </nav>
 
-  <!-- Home -->
-  <div id="home" class="container mx-auto mt-6">
-    <h2 class="text-3xl font-bold mb-4 text-center">Hoş Geldiniz!</h2>
-    <p class="text-lg text-gray-400 mb-6 text-center">En iyi ürünleri keşfetmek için alışverişe başlayın.</p>
-    <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded">
-    <p class="text-center mt-4"><a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-500">Instagram: _kemal1905_</a></p>
+  <div id="auth-section" class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-4">Kayıt Ol</h2>
+    <input id="register-email" type="email" placeholder="E-posta" class="w-full p-2 mb-4 border rounded">
+    <input id="register-password" type="password" placeholder="Şifre" class="w-full p-2 mb-4 border rounded">
+    <button onclick="registerUser()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Kayıt Ol</button>
+
+    <h2 class="text-2xl font-bold mt-8 mb-4">Giriş Yap</h2>
+    <input id="login-email" type="email" placeholder="E-posta" class="w-full p-2 mb-4 border rounded">
+    <input id="login-password" type="password" placeholder="Şifre" class="w-full p-2 mb-4 border rounded">
+    <button onclick="loginUser()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Giriş Yap</button>
   </div>
 
-  <!-- Login Page -->
-  <div id="login" class="hidden container mx-auto mt-6">
-    <h2 class="text-3xl font-bold mb-4 text-center">Giriş Yap</h2>
-    <form class="bg-gray-800 p-6 rounded shadow-md max-w-sm mx-auto">
-      <div class="mb-4">
-        <label class="block text-gray-400 mb-2">Kullanıcı Adı</label>
-        <input type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Kullanıcı adınızı girin">
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-400 mb-2">Şifre</label>
-        <input type="password" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Şifrenizi girin">
-      </div>
-      <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Giriş Yap</button>
-    </form>
+  <div id="welcome-section" class="container mx-auto p-6 hidden">
+    <h2 class="text-2xl font-bold mb-4">Hoş Geldiniz, <span id="user-email"></span></h2>
+    <button onclick="logoutUser()" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">Çıkış Yap</button>
   </div>
 
   <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
-    const mobileMenu = document.getElementById("mobile-menu");
-    const pages = ["home", "login"];
-
     hamburgerBtn.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-      pages.forEach(page => document.getElementById(page).classList.add("hidden"));
+      const authSection = document.getElementById("auth-section");
+      const welcomeSection = document.getElementById("welcome-section");
+      authSection.classList.toggle("hidden");
+      welcomeSection.classList.add("hidden");
     });
-
-    function showHome() {
-      mobileMenu.classList.add("hidden");
-      document.getElementById("home").classList.remove("hidden");
-    }
-
-    function showLogin() {
-      mobileMenu.classList.add("hidden");
-      document.getElementById("login").classList.remove("hidden");
-    }
-
-    function showCart() {
-      mobileMenu.classList.add("hidden");
-      alert("Sepet henüz hazır değil!");
-    }
   </script>
 </body>
 </html>
