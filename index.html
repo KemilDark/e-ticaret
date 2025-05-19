@@ -30,9 +30,26 @@
     <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover">
   </section>
 
+  <!-- Kayıt ve Giriş Formu -->
+  <section id="auth-section" class="mt-6 px-4">
+    <div class="bg-gray-800 p-6 rounded shadow-md">
+      <h2 class="text-2xl mb-4">Kayıt Ol</h2>
+      <input type="email" id="register-email" placeholder="Email" class="w-full mb-3 p-2 rounded">
+      <input type="password" id="register-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded">
+      <button onclick="registerUser()" class="bg-blue-600 w-full py-2 rounded text-white">Kayıt Ol</button>
+    </div>
+    <div class="bg-gray-800 p-6 rounded shadow-md mt-4">
+      <h2 class="text-2xl mb-4">Giriş Yap</h2>
+      <input type="email" id="login-email" placeholder="Email" class="w-full mb-3 p-2 rounded">
+      <input type="password" id="login-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded">
+      <button onclick="loginUser()" class="bg-green-600 w-full py-2 rounded text-white">Giriş Yap</button>
+    </div>
+  </section>
+
   <!-- İletişim Bilgisi -->
   <footer class="mt-6 p-4 bg-black text-center">
-    <a href="https://www.instagram.com/kemal.1905__/" target="_blank" class="text-blue-400">kemal.1905__</a>
+    <p class="text-white">İletişim:</p>
+    <a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-400">_kemal1905_</a>
   </footer>
 
   <script>
@@ -49,18 +66,32 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.getAuth(app);
 
+    function registerUser() {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      firebase.createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Kayıt başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    function loginUser() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      firebase.signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Giriş başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
     document.getElementById("hamburger-btn").addEventListener("click", () => {
       const navMenu = document.getElementById("nav-menu");
       navMenu.classList.toggle("hidden");
     });
-
-    function showHome() {
-      alert("Ana Sayfa butonu tıklandı!");
-    }
-
-    function showCart() {
-      alert("Sepet butonu tıklandı!");
-    }
   </script>
 </body>
 </html>
