@@ -6,9 +6,54 @@
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-</script>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
+      authDomain: "e-ticaret-74b1c.firebaseapp.com",
+      projectId: "e-ticaret-74b1c",
+      storageBucket: "e-ticaret-74b1c.appspot.com",
+      messagingSenderId: "547307588836",
+      appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
+      measurementId: "G-GTL1NTV1G1"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function registerUser() {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Kayıt başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+          document.getElementById("main-section").classList.remove("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    function loginUser() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Giriş başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+          document.getElementById("main-section").classList.remove("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    // Kullanıcı giriş durumu kontrolü
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("auth-section").classList.add("hidden");
+        document.getElementById("main-section").classList.remove("hidden");
+      }
+    });
+  </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
   <!-- Logo ve Navbar -->
@@ -22,13 +67,13 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
       </svg>
     </button>
     <nav id="nav-menu" class="hidden md:flex space-x-4">
-      <a href="#home" class="hover:underline" onclick="showHome()">Ana Sayfa</a>
-      <a href="#cart" class="hover:underline" onclick="showCart()">Sepet</a>
+      <a href="#home" class="hover:underline">Ana Sayfa</a>
+      <a href="#cart" class="hover:underline">Sepet</a>
     </nav>
   </header>
 
   <!-- Banner -->
-  <section class="mt-4">
+  <section id="main-section" class="hidden mt-4">
     <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover">
   </section>
 
@@ -55,47 +100,5 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
     <p class="text-white">İletişim:</p>
     <a href="mailto:ornek@ornek.com" class="text-blue-400">ornek@ornek.com</a>
   </footer>
-
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
-      authDomain: "e-ticaret-74b1c.firebaseapp.com",
-      projectId: "e-ticaret-74b1c",
-      storageBucket: "e-ticaret-74b1c.appspot.com",
-      messagingSenderId: "547307588836",
-      appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
-      measurementId: "G-GTL1NTV1G1"
-    };
-    const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-    function registerUser() {
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("Kayıt başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-        })
-        .catch((error) => alert(error.message));
-    }
-
-    function loginUser() {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("Giriş başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-        })
-        .catch((error) => alert(error.message));
-    }
-
-    document.getElementById("hamburger-btn").addEventListener("click", () => {
-      const navMenu = document.getElementById("nav-menu");
-      navMenu.classList.toggle("hidden");
-    });
-  </script>
 </body>
 </html>
