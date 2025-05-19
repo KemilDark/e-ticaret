@@ -36,6 +36,7 @@
       const app = firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
       const db = firebase.firestore();
+      const logsRef = db.collection("logs"); // Log koleksiyonu referansı
       console.log("Firebase başlatıldı:", app.name);
     } catch (error) {
       console.error("Firebase başlatma hatası:", error);
@@ -47,6 +48,30 @@
       { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150", baslik: "Hızlı ve Güçlü", aciklama: "Profesyonel işler için ideal yüksek performanslı laptop.", yayinlandi: true },
       { id: 3, ad: "Kulaklık", fiyat: 1000, gorsel: "https://via.placeholder.com/150", baslik: "Rahat Kullanım", aciklama: "Uzun süreli kullanım için ergonomik tasarım.", yayinlandi: true },
     ];
+
+    // Log kaydı oluşturma fonksiyonu
+    const logKaydiOlustur = (islem, urun, kullanici) => {
+      if (!kullanici) {
+        console.error("Log kaydı için kullanıcı girişi gerekli!");
+        return;
+      }
+      const logData = {
+        islem: islem, // "ekleme" veya "duzenleme"
+        urunId: urun.id,
+        baslik: urun.baslik,
+        aciklama: urun.aciklama,
+        email: kullanici.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      logsRef
+        .add(logData)
+        .then(() => {
+          console.log(`${islem} işlemi loglandı:`, logData);
+        })
+        .catch((error) => {
+          console.error("Log kaydı hatası:", error);
+        });
+    };
 
     // Ana Uygulama Bileşeni
     function App() {
@@ -69,6 +94,7 @@
         aciklama: "",
         yayinlandi: false,
       });
+      const [loglar, setLoglar] = React.useState([]); // Loglar için state
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
@@ -103,6 +129,25 @@
           setHata("Kullanıcı durumu alınamadı: " + error.message);
         }
       }, []);
+
+      // Admin panelinde logları alma
+      React.useEffect(() => {
+        if (sayfa === "admin" && adminGiris) {
+          const unsubscribe = logsRef
+            .orderBy("timestamp", "desc")
+            .onSnapshot((snapshot) => {
+              const logListesi = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setLoglar(logListesi);
+            }, (error) => {
+              console.error("Log okuma hatası:", error);
+              setHata("Loglar yüklenemedi: " + error.message);
+            });
+          return () => unsubscribe();
+        }
+      }, [sayfa, adminGiris]);
 
       // Sepete ürün ekleme
       const sepeteEkle = (urun) => {
@@ -237,10 +282,14 @@
           setHata("Lütfen tüm zorunlu alanları doldurun!");
           return;
         }
+        const yeni面ți面 olarak oluşturuyor.
         const yeniId = urunlerState.length ? Math.max(...urunlerState.map(u => u.id)) + 1 : 1;
-        setUrunlerState([...urunlerState, { id: yeniId, ...yeniUrun, fiyat: parseFloat(yeniUrun.fiyat), yayinlandi: yeniUrun.yayinlandi }]);
+        const yeniUrunData = { id: yeniId, ...yeniUrun, fiyat: parseFloat(yeniUrun.fiyat), yayinlandi: yeniUrun.yayinlandi };
+        setUrunlerState([...urunlerState, yeniUrunData]);
         setYeniUrun({ ad: "", fiyat: "", gorsel: "", baslik: "", aciklama: "", yayinlandi: false });
         setHata("");
+        // Log kaydı oluştur
+        logKaydiOlustur("ekleme", yeniUrunData, kullanici);
       };
 
       // Ürün silme
@@ -258,6 +307,8 @@
           setUrunlerState(urunlerState.map((urun) =>
             urun.id === duzenlenenUrun.id ? { ...urun, baslik: duzenlenenUrun.baslik, aciklama: duzenlenenUrun.aciklama, yayinlandi: duzenlenenUrun.yayinlandi } : urun
           ));
+          // Log kaydı oluştur
+          logKaydiOlustur("duzenleme", duzenlenenUrun, kullanici);
           setDuzenlenenUrun(null);
         }
       };
@@ -753,6 +804,28 @@
                   </div>
                 ))}
               </div>
+
+              {/* Log Kanalı */}
+              <div className="border border-gray-600 p-4 rounded bg-gray-800 mt-4">
+                <h3 className="text-xl mb-2">İşlem Logları</h3>
+                {loglar.length === 0 ? (
+                  <p>Henüz log kaydı yok.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {loglar.map((log) => (
+                      <div key={log.id} className="border-b border-gray-600 py-2">
+                        <p><strong>İşlem:</strong> {log.islem}</p>
+                        <p><strong>Ürün ID:</strong> {log.urunId}</p>
+                        <p><strong>Başlık:</strong> {log.baslik}</p>
+                        <p><strong>Açıklama:</strong> {log.aciklama}</p>
+                        <p><strong>E-posta:</strong> {log.email}</p>
+                        <p><strong>Tarih:</strong> {log.timestamp?.toDate().toLocaleString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {duzenlenenUrun && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                   <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
