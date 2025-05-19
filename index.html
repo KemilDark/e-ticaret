@@ -1,127 +1,377 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Ticaret Sitesi</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    
+  <!-- React ve ReactDOM CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <!-- Babel CDN for JSX -->
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/Babel.min.js"></script>
+  <!-- Firebase SDK CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Firebase yapılandırması
     const firebaseConfig = {
       apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
       authDomain: "e-ticaret-74b1c.firebaseapp.com",
       projectId: "e-ticaret-74b1c",
-      storageBucket: "e-ticaret-74b1c.appspot.com",
+      storageBucket: "e-ticaret-74b1c.firebasestorage.app",
       messagingSenderId: "547307588836",
       appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
       measurementId: "G-GTL1NTV1G1"
     };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
 
-    function registerUser() {
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Kayıt başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-          document.getElementById("main-section").classList.remove("hidden");
-        })
-        .catch((error) => alert(error.message));
+    // Firebase başlatma
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Ürün verileri (örnek)
+    const urunler = [
+      { id: 1, ad: "Telefon", fiyat: 15000, gorsel: "https://via.placeholder.com/150" },
+      { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150" },
+      { id: 3, ad: "Kulaklık", fiyat: 1000, gorsel: "https://via.placeholder.com/150" },
+    ];
+
+    // Ana Uygulama Bileşeni
+    function App() {
+      const [sepet, setSepet] = React.useState([]);
+      const [sayfa, setSayfa] = React.useState("urunler");
+      const [kullanici, setKullanici] = React.useState(null);
+      const [hata, setHata] = React.useState("");
+
+      // Kullanıcı durumunu izleme
+      React.useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          setKullanici(user);
+        });
+        return () => unsubscribe();
+      }, []);
+
+      // Sepete ürün ekleme
+      const sepeteEkle = (urun) => {
+        const mevcutUrun = sepet.find((item) => item.id === urun.id);
+        if (mevcutUrun) {
+          setSepet(
+            sepet.map((item) =>
+              item.id === urun.id ? { ...item, adet: item.adet + 1 } : item
+            )
+          );
+        } else {
+          setSepet([...sepet, { ...urun, adet: 1 }]);
+        }
+      };
+
+      // Sepetten ürün çıkarma
+      const sepettenCikar = (urunId) => {
+        setSepet(sepet.filter((item) => item.id !== urunId));
+      };
+
+      // Toplam fiyat hesaplama
+      const toplamFiyat = sepet.reduce(
+        (toplam, item) => toplam + item.fiyat * item.adet,
+        0
+      );
+
+      // Kayıt olma işlemi
+      const handleKayit = (email, sifre) => {
+        auth
+          .createUserWithEmailAndPassword(email, sifre)
+          .then(() => {
+            setHata("");
+            setSayfa("urunler");
+          })
+          .catch((error) => {
+            setHata("Kayıt başarısız: " + error.message);
+          });
+      };
+
+      // Giriş yapma işlemi
+      const handleGiris = (email, sifre) => {
+        auth
+          .signInWithEmailAndPassword(email, sifre)
+          .then(() => {
+            setHata("");
+            setSayfa("urunler");
+          })
+          .catch((error) => {
+            setHata("Giriş başarısız: " + error.message);
+          });
+      };
+
+      // Çıkış yapma işlemi
+      const handleCikis = () => {
+        auth.signOut().then(() => {
+          setSayfa("urunler");
+        });
+      };
+
+      return (
+        <div className="container mx-auto p-4">
+          <header className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold">E-Ticaret Sitesi</h1>
+            <div className="flex items-center space-x-2">
+              {kullanici ? (
+                <>
+                  <span>Hoş geldin, {kullanici.email}</span>
+                  <button
+                    onClick={handleCikis}
+                    className="bg-red-500 text-white px-4 py-2 rounded"
+                  >
+                    Çıkış Yap
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setSayfa("giris")}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Giriş Yap
+                  </button>
+                  <button
+                    onClick={() => setSayfa("kayit")}
+                    className="bg-green-500 text-white px-4 py-2 rounded"
+                  >
+                    Kayıt Ol
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => setSayfa("sepet")}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Sepet ({sepet.length})
+              </button>
+            </div>
+          </header>
+
+          {hata && <p className="text-red-500 mb-4">{hata}</p>}
+
+          {sayfa === "urunler" && (
+            <div>
+              <h2 className="text-2xl mb-4">Ürünler</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {urunler.map((urun) => (
+                  <div
+                    key={urun.id}
+                    className="border p-4 rounded shadow"
+                  >
+                    <img
+                      src={urun.gorsel}
+                      alt={urun.ad}
+                      className="w-full h-40 object-cover mb-2"
+                    />
+                    <h3 className="text-xl">{urun.ad}</h3>
+                    <p className="text-lg">{urun.fiyat} TL</p>
+                    <button
+                      onClick={() => sepeteEkle(urun)}
+                      className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                    >
+                      Sepete Ekle
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {sayfa === "sepet" && (
+            <div>
+              <h2 className="text-2xl mb-4">Sepet</h2>
+              {sepet.length === 0 ? (
+                <p>Sepetiniz boş.</p>
+              ) : (
+                <div>
+                  {sepet.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex justify-between items-center border-b py-2"
+                    >
+                      <div>
+                        <h3>{item.ad}</h3>
+                        <p>{item.fiyat} TL x {item.adet} = {item.fiyat * item.adet} TL</p>
+                      </div>
+                      <button
+                        onClick={() => sepettenCikar(item.id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded"
+                      >
+ ETLİ
+                        Kaldır
+                      </button>
+                    </div>
+                  ))}
+                  <p className="text-xl mt-4">Toplam: {toplamFiyat} TL</p>
+                  <button
+                    onClick={() => setSayfa("odeme")}
+                    className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+                  >
+                    Ödeme Yap
+                  </button>
+                  <button
+                    onClick={() => setSayfa("urunler")}
+                    className="bg-gray-500 text-white px-4 py-2 rounded mt-4 ml-2"
+                  >
+                    Geri Dön
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {sayfa === "odeme" && (
+            <div>
+              <h2 className="text-2xl mb-4">Ödeme</h2>
+              <div className="border p-4 rounded">
+                <h3 className="text-xl mb-2">Kredi Kartı Bilgileri</h3>
+                <div className="mb-4">
+                  <label className="block mb-1">Kart Numarası</label>
+                  <input
+                    type="text"
+                    placeholder="1234 5678 9012 3456"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">Ad Soyad</label>
+                  <input
+                    type="text"
+                    placeholder="Ad Soyad"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <div className="flex mb-4">
+                  <div className="w-1/2 mr-2">
+                    <label className="block mb-1">Son Kullanım</label>
+                    <input
+                      type="text"
+                      placeholder="AA/YY"
+                      className="border p-2 w-full rounded"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block mb-1">CVV</label>
+                    <input
+                      type="text"
+                      placeholder="123"
+                      className="border p-2 w-full rounded"
+                    />
+                  </div>
+                </div>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  onClick={() => alert("Ödeme işlemi tamamlandı! (Simülasyon)")}
+                >
+                  Ödemeyi Tamamla
+                </button>
+                <button
+                  onClick={() => setSayfa("sepet")}
+                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+                >
+                  Geri Dön
+                </button>
+              </div>
+            </div>
+          )}
+
+          {sayfa === "giris" && (
+            <div>
+              <h2 className="text-2xl mb-4">Giriş Yap</h2>
+              <div className="border p-4 rounded">
+                <div className="mb-4">
+                  <label className="block mb-1">E-posta</label>
+                  <input
+                    id="girisEmail"
+                    type="email"
+                    placeholder="ornek@ornek.com"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">Şifre</label>
+                  <input
+                    id="girisSifre"
+                    type="password"
+                    placeholder="Şifreniz"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    const email = document.getElementById("girisEmail").value;
+                    const sifre = document.getElementById("girisSifre").value;
+                    handleGiris(email, sifre);
+                  }}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Giriş Yap
+                </button>
+                <button
+                  onClick={() => setSayfa("urunler")}
+                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+                >
+                  Geri Dön
+                </button>
+              </div>
+            </div>
+          )}
+
+          {sayfa === "kayit" && (
+            <div>
+              <h2 className="text-2xl mb-4">Kayıt Ol</h2>
+              <div className="border p-4 rounded">
+                <div className="mb-4">
+                  <label className="block mb-1">E-posta</label>
+                  <input
+                    id="kayitEmail"
+                    type="email"
+                    placeholder="ornek@ornek.com"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">Şifre</label>
+                  <input
+                    id="kayitSifre"
+                    type="password"
+                    placeholder="Şifreniz"
+                    className="border p-2 w-full rounded"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    const email = document.getElementById("kayitEmail").value;
+                    const sifre = document.getElementById("kayitSifre").value;
+                    handleKayit(email, sifre);
+                  }}
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  Kayıt Ol
+                </button>
+                <button
+                  onClick={() => setSayfa("urunler")}
+                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+                >
+                  Geri Dön
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
     }
 
-    function loginUser() {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Giriş başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-          document.getElementById("main-section").classList.remove("hidden");
-        })
-        .catch((error) => alert(error.message));
-    }
-
-    // Çıkış yapma fonksiyonu
-    function logoutUser() {
-      signOut(auth).then(() => {
-        alert("Çıkış yapıldı.");
-        document.getElementById("auth-section").classList.remove("hidden");
-        document.getElementById("main-section").classList.add("hidden");
-      }).catch((error) => {
-        alert("Çıkış yaparken hata oluştu: " + error.message);
-      });
-    }
-
-    // Sayfa yüklendiğinde butonun eventini bağla
-    window.onload = () => {
-      document.getElementById("logout-btn").addEventListener("click", logoutUser);
-    };
-
-    // Kullanıcı giriş durumu kontrolü
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("auth-section").classList.add("hidden");
-        document.getElementById("main-section").classList.remove("hidden");
-      } else {
-        document.getElementById("auth-section").classList.remove("hidden");
-        document.getElementById("main-section").classList.add("hidden");
-      }
-    });
+    // React uygulamasını render etme
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
   </script>
-</head>
-<body class="bg-black text-gray-200 font-sans">
-  <!-- Logo ve Navbar -->
-  <header class="bg-black text-white p-4 flex justify-between items-center">
-    <div class="flex items-center">
-      <img src="https://i.pinimg.com/736x/34/47/a0/3447a0c9bbdf4719e348ca2e5a304ec7.jpg" alt="Logo" class="h-12 w-auto object-contain" />
-    </div>
-    <button id="hamburger-btn" class="md:hidden text-white focus:outline-none">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </button>
-    <nav id="nav-menu" class="hidden md:flex space-x-4">
-      <a href="#home" class="hover:underline">Ana Sayfa</a>
-      <a href="#cart" class="hover:underline">Sepet</a>
-    </nav>
-  </header>
-
-  <!-- Banner ve çıkış butonu -->
-  <section id="main-section" class="hidden mt-4 px-4">
-    <img
-      src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
-      alt="Mağaza Banner"
-      class="w-full h-64 object-cover mb-4"
-    />
-    <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded">Çıkış Yap</button>
-  </section>
-
-  <!-- Kayıt ve Giriş Formu -->
-  <section id="auth-section" class="mt-6 px-4">
-    <div class="bg-gray-800 p-6 rounded shadow-md max-w-md mx-auto">
-      <h2 class="text-2xl mb-4">Kayıt Ol</h2>
-      <input type="email" id="register-email" placeholder="Email" class="w-full mb-3 p-2 rounded" />
-      <input type="password" id="register-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded" />
-      <button type="button" onclick="registerUser()" class="bg-blue-600 w-full py-2 rounded text-white">Kayıt Ol</button>
-    </div>
-    <div class="bg-gray-800 p-6 rounded shadow-md max-w-md mx-auto mt-4">
-      <h2 class="text-2xl mb-4">Giriş Yap</h2>
-      <input type="email" id="login-email" placeholder="Email" class="w-full mb-3 p-2 rounded" />
-      <input type="password" id="login-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded" />
-      <button type="button" onclick="loginUser()" class="bg-green-600 w-full py-2 rounded text-white">Giriş Yap</button>
-    </div>
-  </section>
-
-  <!-- İletişim Bilgisi -->
-  <footer class="mt-6 p-4 bg-black text-center">
-    <p class="text-white">İletişim:</p>
-    <a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-400">_kemal1905_</a>
-    <p class="text-white">Email:</p>
-    <a href="mailto:ornek@ornek.com" class="text-blue-400">ornek@ornek.com</a>
-  </footer>
 </body>
 </html>
