@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -12,7 +12,7 @@
       background-color: #1f2937;
       color: #ffffff;
       border-radius: 0.375rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 10;
       min-width: 200px;
       margin-top: 0.5rem;
@@ -20,55 +20,41 @@
     .dropdown-menu a:hover {
       background-color: #374151;
     }
+    .slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    .slide-out {
+      animation: slideOut 0.5s ease-in;
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
   <!-- Navbar -->
-  <nav class="bg-gray-900 text-gray-100 p-4 flex items-center">
-    <img
-      src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg"
-      alt="Mağaza Logosu"
-      class="h-12 w-auto object-contain"
-    />
-    <!-- Hamburger Menu -->
-    <button
-      id="hamburger-btn"
-      class="ml-4 text-white focus:outline-none"
-      aria-label="Menüyü aç"
-    >
-      <svg
-        class="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16m-7 6h7"
-        ></path>
-      </svg>
-    </button>
-
-    <!-- Menü İçeriği -->
-    <div
-      id="nav-menu"
-      class="hidden absolute top-16 left-4 bg-gray-900 text-white rounded shadow-lg py-2 w-48"
-    >
-      <a
-        href="#"
-        class="block px-4 py-2 hover:bg-gray-700"
-        onclick="showHome(); toggleMenu()"
-        >Ana Sayfa</a
-      >
-      <a
-        href="#"
-        class="block px-4 py-2 hover:bg-gray-700"
-        onclick="showCart(); toggleMenu()"
-        >Sepet (<span id="cart-count">0</span>)</a
-      >
+  <nav class="bg-gray-900 text-gray-100 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain">
+      </div>
+      <!-- Hamburger Menu Button -->
+      <button id="hamburger-btn" class="md:hidden focus:outline-none text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <!-- Menu Items -->
+      <div id="nav-menu" class="hidden md:flex md:items-center md:space-x-4">
+        <a href="#" class="px-4 hover:underline" onclick="showHome()">Ana Sayfa</a>
+        <a href="#" class="px-4 hover:underline" onclick="showCart()">Sepet (<span id="cart-count">0</span>)</a>
+      </div>
     </div>
   </nav>
 
@@ -76,25 +62,9 @@
   <div class="container mx-auto mt-6">
     <div id="home" class="text-center">
       <h2 class="text-3xl font-bold mb-4">Hoş Geldiniz!</h2>
-      <p class="text-lg text-gray-400 mb-6">
-        En iyi ürünleri keşfetmek için kategorilere göz atın.
-      </p>
-      <img
-        src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
-        alt="Mağaza Banner"
-        class="w-full h-64 object-cover rounded"
-      />
+      <p class="text-lg text-gray-400 mb-6">En iyi ürünleri keşfetmek için menüyü açın.</p>
+      <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded">
     </div>
-
-    <!-- Products Page -->
-    <div id="products" class="hidden">
-      <h2 class="text-2xl font-bold mb-4" id="category-title">Ürünler</h2>
-      <div
-        id="product-list"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-      ></div>
-    </div>
-
     <!-- Cart Page -->
     <div id="cart" class="hidden">
       <h2 class="text-2xl font-bold mb-4">Sepetiniz</h2>
@@ -102,55 +72,24 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-center py-4 mt-12">
-    <p class="text-white">
-      İletişim:
-      <a
-        href="https://www.instagram.com/kemal.1905__/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-blue-500 hover:underline"
-        >Instagram: kemal.1905__</a
-      >
-    </p>
-  </footer>
-
   <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const navMenu = document.getElementById("nav-menu");
-    const home = document.getElementById("home");
-    const productsPage = document.getElementById("products");
-    const cartPage = document.getElementById("cart");
-    const categoryTitle = document.getElementById("category-title");
-    const productList = document.getElementById("product-list");
 
-    function toggleMenu() {
+    hamburgerBtn.addEventListener("click", () => {
       navMenu.classList.toggle("hidden");
-    }
-
-    hamburgerBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleMenu();
-    });
-
-    document.addEventListener("click", () => {
-      navMenu.classList.add("hidden");
+      navMenu.classList.toggle("slide-in");
     });
 
     function showHome() {
-      home.classList.remove("hidden");
-      productsPage.classList.add("hidden");
-      cartPage.classList.add("hidden");
+      document.getElementById("home").classList.remove("hidden");
+      document.getElementById("cart").classList.add("hidden");
     }
 
     function showCart() {
-      home.classList.add("hidden");
-      productsPage.classList.add("hidden");
-      cartPage.classList.remove("hidden");
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById("cart").classList.remove("hidden");
     }
-
-    showHome();
   </script>
 </body>
 </html>
