@@ -83,6 +83,10 @@
     </div>
   </div>
 
+  <footer class="bg-gray-900 text-gray-400 text-center py-4 mt-12">
+    <p>İletişim: <a href="https://instagram.com/_kemal1905_" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Instagram: _kemal1905_</a></p>
+  </footer>
+
   <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const mobileMenu = document.getElementById("mobile-menu");
@@ -106,27 +110,20 @@
     });
 
     document.addEventListener("click", (e) => {
-      if (
-        !mobileMenu.contains(e.target) &&
-        !hamburgerBtn.contains(e.target)
-      ) {
+      if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
         mobileMenu.classList.add("hidden");
         navMenu.classList.remove("hidden");
       }
     });
 
+    function showHome() {
+      home.classList.remove("hidden");
+      cartPage.classList.add("hidden");
+    }
+
     function showCart() {
       home.classList.add("hidden");
       cartPage.classList.remove("hidden");
-      mobileMenu.classList.add("hidden");
-      navMenu.classList.remove("hidden");
-    }
-
-    function showHome() {
-      cartPage.classList.add("hidden");
-      home.classList.remove("hidden");
-      mobileMenu.classList.add("hidden");
-      navMenu.classList.remove("hidden");
     }
 
     showHome();
