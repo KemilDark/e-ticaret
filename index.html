@@ -41,11 +41,11 @@
       console.error("Firebase başlatma hatası:", error);
     }
 
-    // Ürün verileri
+    // Ürün verileri (başlık ve açıklama ile)
     const urunler = [
-      { id: 1, ad: "Telefon", fiyat: 15000, gorsel: "https://via.placeholder.com/150" },
-      { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150" },
-      { id: 3, ad: "Kulaklık", fiyat: 1000, gorsel: "https://via.placeholder.com/150" },
+      { id: 1, ad: "Telefon", fiyat: 15000, gorsel: "https://via.placeholder.com/150", baslik: "En Yeni Model", aciklama: "Gelişmiş kamera ve performans özellikleriyle donatılmış akıllı telefon." },
+      { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150", baslik: "Hızlı ve Güçlü", aciklama: "Profesyonel işler için ideal yüksek performanslı laptop." },
+      { id: 3, ad: "Kulaklık", fiyat: 1000, gorsel: "https://via.placeholder.com/150", baslik: "Rahat Kullanım", aciklama: "Uzun süreli kullanım için ergonomik tasarım." },
     ];
 
     // Ana Uygulama Bileşeni
@@ -57,6 +57,8 @@
       const [isim, setIsim] = React.useState("");
       const [kartBilgileri, setKartBilgileri] = React.useState(null);
       const [menuAcik, setMenuAcik] = React.useState(false);
+      const [urunlerState, setUrunlerState] = React.useState(urunler);
+      const [duzenlenenUrun, setDuzenlenenUrun] = React.useState(null);
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
@@ -207,6 +209,25 @@
         }
       };
 
+      // Ürün düzenleme fonksiyonu
+      const handleUrunDuzenle = (urun) => {
+        setDuzenlenenUrun({ ...urun });
+      };
+
+      const handleKaydet = () => {
+        if (duzenlenenUrun) {
+          setUrunlerState(urunlerState.map((urun) =>
+            urun.id === duzenlenenUrun.id ? { ...urun, baslik: duzenlenenUrun.baslik, aciklama: duzenlenenUrun.aciklama } : urun
+          ));
+          setDuzenlenenUrun(null);
+        }
+      };
+
+      const handleDegisiklik = (e) => {
+        const { name, value } = e.target;
+        setDuzenlenenUrun({ ...duzenlenenUrun, [name]: value });
+      };
+
       return (
         <div className="container mx-auto p-4 bg-black text-white min-h-screen">
           <header className="flex justify-between items-center mb-4">
@@ -308,7 +329,7 @@
               />
               <h2 className="text-2xl mb-4">Ürünler</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {urunler.map((urun) => (
+                {urunlerState.map((urun) => (
                   <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
                     <img
                       src={urun.gorsel}
@@ -316,16 +337,62 @@
                       className="w-full h-40 object-cover mb-2"
                     />
                     <h3 className="text-xl">{urun.ad}</h3>
+                    <p className="text-md text-gray-300">{urun.baslik}</p>
+                    <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
                     <p className="text-lg">{urun.fiyat} TL</p>
                     <button
                       onClick={() => sepeteEkle(urun)}
-                      className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                      className="bg-green-500 text-white px-4 py-2 rounded mt-2 mr-2"
                     >
                       Sepete Ekle
+                    </button>
+                    <button
+                      onClick={() => handleUrunDuzenle(urun)}
+                      className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                    >
+                      Düzenle
                     </button>
                   </div>
                 ))}
               </div>
+              {duzenlenenUrun && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 className="text-xl mb-4">Ürün Düzenle</h3>
+                    <div className="mb-4">
+                      <label className="block mb-1">Başlık</label>
+                      <input
+                        type="text"
+                        name="baslik"
+                        value={duzenlenenUrun.baslik || ""}
+                        onChange={handleDegisiklik}
+                        className="border p-2 w-full rounded bg-gray-700 text-white"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block mb-1">Açıklama</label>
+                      <textarea
+                        name="aciklama"
+                        value={duzenlenenUrun.aciklama || ""}
+                        onChange={handleDegisiklik}
+                        className="border p-2 w-full rounded bg-gray-700 text-white"
+                      />
+                    </div>
+                    <button
+                      onClick={handleKaydet}
+                      className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                    >
+                      Kaydet
+                    </button>
+                    <button
+                      onClick={() => setDuzenlenenUrun(null)}
+                      className="bg-red-500 text-white px-4 py-2 rounded"
+                    >
+                      İptal
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
