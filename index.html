@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
     
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
       authDomain: "e-ticaret-74b1c.firebaseapp.com",
@@ -22,7 +21,47 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Kullanıcı durumunu kontrol et
+    function registerUser() {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Kayıt başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+          document.getElementById("main-section").classList.remove("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    function loginUser() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Giriş başarılı!");
+          document.getElementById("auth-section").classList.add("hidden");
+          document.getElementById("main-section").classList.remove("hidden");
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    // Çıkış yapma fonksiyonu
+    function logoutUser() {
+      signOut(auth).then(() => {
+        alert("Çıkış yapıldı.");
+        document.getElementById("auth-section").classList.remove("hidden");
+        document.getElementById("main-section").classList.add("hidden");
+      }).catch((error) => {
+        alert("Çıkış yaparken hata oluştu: " + error.message);
+      });
+    }
+
+    // Sayfa yüklendiğinde butonun eventini bağla
+    window.onload = () => {
+      document.getElementById("logout-btn").addEventListener("click", logoutUser);
+    };
+
+    // Kullanıcı giriş durumu kontrolü
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById("auth-section").classList.add("hidden");
@@ -32,49 +71,57 @@
         document.getElementById("main-section").classList.add("hidden");
       }
     });
-
-    function registerUser() {
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => alert("Kayıt başarılı!"))
-        .catch((error) => alert(error.message));
-    }
-
-    function loginUser() {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => alert("Giriş başarılı!"))
-        .catch((error) => alert(error.message));
-    }
-
-    function logoutUser() {
-      signOut(auth).then(() => alert("Çıkış yapıldı!"));
-    }
   </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
+  <!-- Logo ve Navbar -->
+  <header class="bg-black text-white p-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <img src="https://i.pinimg.com/736x/34/47/a0/3447a0c9bbdf4719e348ca2e5a304ec7.jpg" alt="Logo" class="h-12 w-auto object-contain" />
+    </div>
+    <button id="hamburger-btn" class="md:hidden text-white focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+    <nav id="nav-menu" class="hidden md:flex space-x-4">
+      <a href="#home" class="hover:underline">Ana Sayfa</a>
+      <a href="#cart" class="hover:underline">Sepet</a>
+    </nav>
+  </header>
+
+  <!-- Banner ve çıkış butonu -->
+  <section id="main-section" class="hidden mt-4 px-4">
+    <img
+      src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
+      alt="Mağaza Banner"
+      class="w-full h-64 object-cover mb-4"
+    />
+    <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded">Çıkış Yap</button>
+  </section>
+
   <!-- Kayıt ve Giriş Formu -->
   <section id="auth-section" class="mt-6 px-4">
-    <div class="bg-gray-800 p-6 rounded shadow-md">
+    <div class="bg-gray-800 p-6 rounded shadow-md max-w-md mx-auto">
       <h2 class="text-2xl mb-4">Kayıt Ol</h2>
-      <input type="email" id="register-email" placeholder="Email" class="w-full mb-3 p-2 rounded">
-      <input type="password" id="register-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded">
+      <input type="email" id="register-email" placeholder="Email" class="w-full mb-3 p-2 rounded" />
+      <input type="password" id="register-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded" />
       <button type="button" onclick="registerUser()" class="bg-blue-600 w-full py-2 rounded text-white">Kayıt Ol</button>
     </div>
-    <div class="bg-gray-800 p-6 rounded shadow-md mt-4">
+    <div class="bg-gray-800 p-6 rounded shadow-md max-w-md mx-auto mt-4">
       <h2 class="text-2xl mb-4">Giriş Yap</h2>
-      <input type="email" id="login-email" placeholder="Email" class="w-full mb-3 p-2 rounded">
-      <input type="password" id="login-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded">
+      <input type="email" id="login-email" placeholder="Email" class="w-full mb-3 p-2 rounded" />
+      <input type="password" id="login-password" placeholder="Şifre" class="w-full mb-3 p-2 rounded" />
       <button type="button" onclick="loginUser()" class="bg-green-600 w-full py-2 rounded text-white">Giriş Yap</button>
     </div>
   </section>
 
-  <!-- Ana İçerik -->
-  <section id="main-section" class="hidden mt-4">
-    <h2 class="text-3xl font-bold text-center mb-4">Mağazamıza Hoş Geldiniz!</h2>
-    <button onclick="logoutUser()" class="bg-red-600 w-full py-2 rounded text-white">Çıkış Yap</button>
-  </section>
+  <!-- İletişim Bilgisi -->
+  <footer class="mt-6 p-4 bg-black text-center">
+    <p class="text-white">İletişim:</p>
+    <a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-400">_kemal1905_</a>
+    <p class="text-white">Email:</p>
+    <a href="mailto:ornek@ornek.com" class="text-blue-400">ornek@ornek.com</a>
+  </footer>
 </body>
 </html>
