@@ -6,7 +6,7 @@
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Dropdown menü için stil artık gerek yok, çünkü sadece Sepet var */
+    /* Ekstra stil gerek yok */
   </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
@@ -95,11 +95,20 @@
   <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const mobileMenu = document.getElementById("mobile-menu");
+    const navMenu = document.getElementById("nav-menu");
     const home = document.getElementById("home");
     const cartPage = document.getElementById("cart");
 
     function toggleMobileMenu() {
-      mobileMenu.classList.toggle("hidden");
+      if (mobileMenu.classList.contains("hidden")) {
+        // Menü açılıyor
+        mobileMenu.classList.remove("hidden");
+        navMenu.classList.add("hidden"); // Masaüstü menüyü gizle (mobilde zaten gizli)
+      } else {
+        // Menü kapanıyor
+        mobileMenu.classList.add("hidden");
+        navMenu.classList.remove("hidden"); // Masaüstü menüyü geri göster
+      }
     }
 
     hamburgerBtn.addEventListener("click", (e) => {
@@ -113,14 +122,16 @@
         !hamburgerBtn.contains(e.target)
       ) {
         mobileMenu.classList.add("hidden");
+        navMenu.classList.remove("hidden");
       }
     });
 
     function showCart() {
       home.classList.add("hidden");
       cartPage.classList.remove("hidden");
-      // Mobil menüyü kapat
+      // Menü mobilse kapat
       mobileMenu.classList.add("hidden");
+      navMenu.classList.remove("hidden");
     }
 
     // Başlangıçta ana sayfa gösterilsin
