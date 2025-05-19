@@ -46,7 +46,8 @@
     const initialUrunler = [
       { id: 1, ad: "Logo", fiyat: 25, gorsel: "https://i.pinimg.com/736x/17/03/1a/17031af57da1c44b602e8f3d7dd5b825.jpg", baslik: "örnek", aciklama: "isteğe göre yapılır iletişime geçiniz", yayinlandi: true },
       { id: 2, ad: "Site tasarımı", fiyat: 100, gorsel: "https://i.pinimg.com/736x/58/48/3d/58483d08b4e3bac0a1a726c5d85307c4.jpg", baslik: "Hızlı ve güvenilir", aciklama: "Profesyonel işler için ideal isteğe özel fiyat değişebilir iletişime geçiniz.", yayinlandi: true },
-  ]
+    ];
+
     // Ana Uygulama Bileşeni
     function App() {
       const [sepet, setSepet] = React.useState([]);
@@ -57,6 +58,10 @@
       const [kartBilgileri, setKartBilgileri] = React.useState(null);
       const [menuAcik, setMenuAcik] = React.useState(false);
       const [urunlerState] = React.useState(initialUrunler);
+      // Yeni state'ler: İndirim kodu ve indirim oranı
+      const [indirimKodu, setIndirimKodu] = React.useState("");
+      const [indirimOrani, setIndirimOrani] = React.useState(0);
+      const [indirimHata, setIndirimHata] = React.useState("");
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
@@ -112,6 +117,23 @@
         (toplam, item) => toplam + item.fiyat * item.adet,
         0
       );
+
+      // İndirimli fiyat hesaplama
+      const indirimliFiyat = toplamFiyat * (1 - indirimOrani / 100);
+
+      // İndirim kodu kontrolü
+      const handleIndirimKodu = () => {
+        const kod = indirimKodu.toUpperCase();
+        // Örnek indirim kodu: INDIRIM10 -> %10 indirim
+        if (kod === "INDIRIM10") {
+          setIndirimOrani(10);
+          setIndirimHata("");
+          alert("İndirim kodu uygulandı! %10 indirim kazandınız.");
+        } else {
+          setIndirimOrani(0);
+          setIndirimHata("Geçersiz indirim kodu!");
+        }
+      };
 
       // Kayıt olma
       const handleKayit = (email, sifre) => {
@@ -191,7 +213,7 @@
             { merge: true }
           ).then(() => {
             setKartBilgileri(kartBilgileri);
-            alert("Ödeme işlemi tamamlandı! (Simülasyon) - Kart bilgileri kaydedildi.");
+            alert(`Ödeme işlemi tamamlandı! (Simülasyon) - Toplam: ${indirimliFiyat.toFixed(2)} TL`);
           }).catch((error) => {
             setHata("Kart bilgileri kaydedilemedi: " + error.message);
           });
@@ -354,7 +376,36 @@
                       </button>
                     </div>
                   ))}
-                  <p className="text-xl mt-4">Toplam: {toplamFiyat} TL</p>
+                  {/* İndirim kodu giriş alanı */}
+                  <div className="mt-4">
+                    <h3 className="text-lg mb-2">İndirim Kodu</h3>
+                    <div className="flex mb-4">
+                      <input
+                        type="text"
+                        value={indirimKodu}
+                        onChange={(e) => setIndirimKodu(e.target.value)}
+                        placeholder="İndirim kodunu girin"
+                        className="border p-2 w-full rounded bg-gray-700 text-white mr-2"
+                      />
+                      <button
+                        onClick={handleIndirimKodu}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                      >
+                        Uygula
+                      </button>
+                    </div>
+                    {indirimHata && <p className="text-red-500 mb-4">{indirimHata}</p>}
+                  </div>
+                  {/* Fiyat özeti */}
+                  <p className="text-xl mt-4">Ara Toplam: {toplamFiyat} TL</p>
+                  {indirimOrani > 0 && (
+                    <p className="text-xl text-green-500">
+                      İndirim (%{indirimOrani}): -{(toplamFiyat * (indirimOrani / 100)).toFixed(2)} TL
+                    </p>
+                  )}
+                  <p className="text-xl font-bold">
+                    Toplam: {indirimliFiyat.toFixed(2)} TL
+                  </p>
                   <button
                     onClick={() => setSayfa("odeme")}
                     className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
@@ -429,7 +480,7 @@
                   </div>
                 </div>
                 <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  className="bg-green-500 text-white px parti/4 py-2 rounded"
                   onClick={() => {
                     const kartNumarasi = document.getElementById("kartNumarasi").value;
                     const adSoyad = document.getElementById("adSoyad").value;
