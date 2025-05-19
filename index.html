@@ -70,10 +70,15 @@
                   setIsim(userData.isim || "");
                   setKartBilgileri(userData.kartBilgileri || null);
                 } else {
-                  firebase.firestore().doc(`users/${user.uid}`).set({ isim: "" });
+                  firebase.firestore().doc(`users/${user.uid}`).set({ isim: "" })
+                    .catch((error) => {
+                      console.error("Kullanıcı dokümanı oluşturma hatası:", error);
+                      setHata("Kullanıcı verisi oluşturulamadı: " + error.message);
+                    });
                 }
               }, (error) => {
                 console.error("Firestore okuma hatası:", error);
+                setHata("Veri okuma hatası: " + error.message);
               });
             } else {
               setKartBilgileri(null);
@@ -118,9 +123,14 @@
             .createUserWithEmailAndPassword(email, sifre)
             .then((userCredential) => {
               const user = userCredential.user;
-              firebase.firestore().doc(`users/${user.uid}`).set({ email: user.email, isim: "" });
-              setHata("");
-              setSayfa("urunler");
+              firebase.firestore().doc(`users/${user.uid}`).set({ email: user.email, isim: "" })
+                .then(() => {
+                  setHata("");
+                  setSayfa("urunler");
+                })
+                .catch((error) => {
+                  setHata("Firestore yazma hatası: " + error.message);
+                });
             })
             .catch((error) => {
               setHata("Kayıt hatası: " + (error.message || "Bilinmeyen hata"));
