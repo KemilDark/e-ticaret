@@ -1,53 +1,16 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-  <style>
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      background-color: #1f2937;
-      color: #ffffff;
-      border-radius: 0.375rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 10;
-      min-width: 200px;
-      margin-top: 0.5rem;
-    }
-    .dropdown-menu a:hover {
-      background-color: #374151;
-    }
-  </style>
-</head>
-<body class="bg-black text-gray-200 font-sans">
-  <div id="auth-container" class="container mx-auto mt-6">
-    <div id="login-page">
-      <h2 class="text-3xl font-bold mb-4 text-center">Giriş Yap</h2>
-      <input id="email-login" type="email" placeholder="Email" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200">
-      <input id="password-login" type="password" placeholder="Şifre" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200">
-      <button onclick="login()" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700">Giriş Yap</button>
-      <p class="text-center mt-4">Hesabınız yok mu? <span onclick="showRegister()" class="text-blue-400 cursor-pointer">Kayıt Ol</span></p>
-    </div>
-    <div id="register-page" class="hidden">
-      <h2 class="text-3xl font-bold mb-4 text-center">Kayıt Ol</h2>
-      <input id="email-register" type="email" placeholder="Email" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200">
-      <input id="password-register" type="password" placeholder="Şifre" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200">
-      <button onclick="register()" class="w-full bg-green-600 p-2 rounded hover:bg-green-700">Kayıt Ol</button>
-      <p class="text-center mt-4">Zaten hesabınız var mı? <span onclick="showLogin()" class="text-blue-400 cursor-pointer">Giriş Yap</span></p>
-    </div>
-  </div>
+  <!-- Firebase App (core SDK) -->
+  <script type="module">
+    // Firebase 9 modüler SDK ile import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-  <div id="site-container" class="hidden">
-    <h1 class="text-4xl font-bold text-center">E-Ticaret Sitesi</h1>
-    <button onclick="logout()" class="bg-red-600 p-2 rounded hover:bg-red-700 mt-4">Çıkış Yap</button>
-  </div>
-
-  <script>
     // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
@@ -58,50 +21,51 @@
       appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
       measurementId: "G-GTL1NTV1G1"
     };
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.getAuth(app);
 
-    function showRegister() {
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.showRegister = function() {
       document.getElementById("login-page").classList.add("hidden");
       document.getElementById("register-page").classList.remove("hidden");
-    }
+    };
 
-    function showLogin() {
+    window.showLogin = function() {
       document.getElementById("login-page").classList.remove("hidden");
       document.getElementById("register-page").classList.add("hidden");
-    }
+    };
 
-    function register() {
+    window.register = function() {
       const email = document.getElementById("email-register").value;
       const password = document.getElementById("password-register").value;
-      firebase.createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then(() => {
           alert("Kayıt başarılı! Giriş yapabilirsiniz.");
           showLogin();
         })
         .catch((error) => alert(error.message));
-    }
+    };
 
-    function login() {
+    window.login = function() {
       const email = document.getElementById("email-login").value;
       const password = document.getElementById("password-login").value;
-      firebase.signInWithEmailAndPassword(auth, email, password)
+      signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           document.getElementById("auth-container").classList.add("hidden");
           document.getElementById("site-container").classList.remove("hidden");
         })
         .catch((error) => alert(error.message));
-    }
+    };
 
-    function logout() {
-      firebase.signOut(auth).then(() => {
+    window.logout = function() {
+      signOut(auth).then(() => {
         document.getElementById("auth-container").classList.remove("hidden");
         document.getElementById("site-container").classList.add("hidden");
       });
-    }
+    };
 
-    // Oturum kontrolü
-    firebase.onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById("auth-container").classList.add("hidden");
         document.getElementById("site-container").classList.remove("hidden");
@@ -111,5 +75,28 @@
       }
     });
   </script>
+</head>
+<body class="bg-black text-gray-200 font-sans">
+  <div id="auth-container" class="container mx-auto mt-6">
+    <div id="login-page">
+      <h2 class="text-3xl font-bold mb-4 text-center">Giriş Yap</h2>
+      <input id="email-login" type="email" placeholder="Email" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200" />
+      <input id="password-login" type="password" placeholder="Şifre" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200" />
+      <button onclick="login()" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700">Giriş Yap</button>
+      <p class="text-center mt-4">Hesabınız yok mu? <span onclick="showRegister()" class="text-blue-400 cursor-pointer">Kayıt Ol</span></p>
+    </div>
+    <div id="register-page" class="hidden">
+      <h2 class="text-3xl font-bold mb-4 text-center">Kayıt Ol</h2>
+      <input id="email-register" type="email" placeholder="Email" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200" />
+      <input id="password-register" type="password" placeholder="Şifre" class="w-full p-2 mb-4 rounded bg-gray-800 text-gray-200" />
+      <button onclick="register()" class="w-full bg-green-600 p-2 rounded hover:bg-green-700">Kayıt Ol</button>
+      <p class="text-center mt-4">Zaten hesabınız var mı? <span onclick="showLogin()" class="text-blue-400 cursor-pointer">Giriş Yap</span></p>
+    </div>
+  </div>
+
+  <div id="site-container" class="hidden">
+    <h1 class="text-4xl font-bold text-center">E-Ticaret Sitesi</h1>
+    <button onclick="logout()" class="bg-red-600 p-2 rounded hover:bg-red-700 mt-4">Çıkış Yap</button>
+  </div>
 </body>
 </html>
