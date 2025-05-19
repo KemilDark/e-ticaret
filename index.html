@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
     
     // Firebase config
     const firebaseConfig = {
@@ -22,59 +22,39 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Kayıt olma fonksiyonu
-    function registerUser() {
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Kayıt başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-          document.getElementById("main-section").classList.remove("hidden");
-        })
-        .catch((error) => alert(error.message));
-    }
-
-    // Giriş yapma fonksiyonu
-    function loginUser() {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Giriş başarılı!");
-          document.getElementById("auth-section").classList.add("hidden");
-          document.getElementById("main-section").classList.remove("hidden");
-        })
-        .catch((error) => alert(error.message));
-    }
-
-    // Kullanıcı giriş durumu kontrolü
+    // Kullanıcı durumunu kontrol et
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById("auth-section").classList.add("hidden");
         document.getElementById("main-section").classList.remove("hidden");
+      } else {
+        document.getElementById("auth-section").classList.remove("hidden");
+        document.getElementById("main-section").classList.add("hidden");
       }
     });
+
+    function registerUser() {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Kayıt başarılı!"))
+        .catch((error) => alert(error.message));
+    }
+
+    function loginUser() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Giriş başarılı!"))
+        .catch((error) => alert(error.message));
+    }
+
+    function logoutUser() {
+      signOut(auth).then(() => alert("Çıkış yapıldı!"));
+    }
   </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
-  <!-- Logo ve Navbar -->
-  <header class="bg-black text-white p-4 flex justify-between items-center">
-    <div class="flex items-center">
-      <img src="https://i.pinimg.com/736x/34/47/a0/3447a0c9bbdf4719e348ca2e5a304ec7.jpg" alt="Logo" class="h-12 w-auto object-contain">
-    </div>
-    <button id="hamburger-btn" class="md:hidden text-white focus:outline-none">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </button>
-  </header>
-
-  <!-- Banner -->
-  <section id="main-section" class="hidden mt-4">
-    <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover">
-  </section>
-
   <!-- Kayıt ve Giriş Formu -->
   <section id="auth-section" class="mt-6 px-4">
     <div class="bg-gray-800 p-6 rounded shadow-md">
@@ -91,10 +71,10 @@
     </div>
   </section>
 
-  <!-- İletişim Bilgisi -->
-  <footer class="mt-6 p-4 bg-black text-center">
-    <p class="text-white">İletişim:</p>
-    <a href="https://www.instagram.com/kemal.1905__/" target="_blank" class="text-blue-400">kemal.1905__</a>
-  </footer>
+  <!-- Ana İçerik -->
+  <section id="main-section" class="hidden mt-4">
+    <h2 class="text-3xl font-bold text-center mb-4">Mağazamıza Hoş Geldiniz!</h2>
+    <button onclick="logoutUser()" class="bg-red-600 w-full py-2 rounded text-white">Çıkış Yap</button>
+  </section>
 </body>
 </html>
