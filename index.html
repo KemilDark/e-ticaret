@@ -16,7 +16,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="console.error('Firebase Auth yüklenemedi');"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="console.error('Firebase Firestore yüklenemedi');"></script>
 </head>
-<body>
+<body class="bg-black text-white">
   <div id="root">Yükleniyor...</div>
 
   <script type="text/babel">
@@ -344,30 +344,30 @@
       };
 
       return (
-        <div className="container mx-auto p-4 bg-black text-white min-h-screen">
-          <header className="flex justify-between items-center mb-4">
+        <div className="container mx-auto p-4 sm:p-6 min-h-screen">
+          <header className="flex justify-between items-center mb-6">
             <img
               src="https://i.pinimg.com/736x/34/47/a0/3447a0c9bbdf4719e348ca2e5a304ec7.jpg"
               alt="Site Logosu"
-              className="h-12"
+              className="h-12 sm:h-16"
             />
             <div className="relative">
               <button
                 onClick={() => setMenuAcik(!menuAcik)}
-                className="p-2 bg-gray-800 rounded focus:outline-none md:hidden"
+                className="p-2 bg-gray-800 rounded focus:outline-none md:hidden hover:bg-gray-700 transition"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                 </svg>
               </button>
               {menuAcik && (
-                <div className="absolute top-10 right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10">
+                <div className="absolute top-12 right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl z-20 transform transition-all duration-300 ease-in-out scale-95 md:scale-100">
                   {kullanici ? (
-                    <div>
-                      <p className="px-4 py-2 text-sm">Hoş geldin, {kullanici.email} ({isim})</p>
+                    <div className="p-2">
+                      <p className="px-4 py-2 text-sm text-gray-300">Hoş geldin, {kullanici.email} ({isim})</p>
                       <button
                         onClick={handleCikis}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-700"
+                        className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 rounded"
                       >
                         Çıkış Yap
                       </button>
@@ -376,13 +376,13 @@
                     <>
                       <button
                         onClick={() => { setSayfa("giris"); setMenuAcik(false); }}
-                        className="block w-full text-left px-4 py-2 text-sm text-blue-500 hover:bg-gray-700"
+                        className="block w-full text-left px-4 py-2 text-sm text-blue-400 hover:bg-gray-700 rounded"
                       >
                         Giriş Yap
                       </button>
                       <button
                         onClick={() => { setSayfa("kayit"); setMenuAcik(false); }}
-                        className="block w-full text-left px-4 py-2 text-sm text-green-500 hover:bg-gray-700"
+                        className="block w-full text-left px-4 py-2 text-sm text-green-400 hover:bg-gray-700 rounded"
                       >
                         Kayıt Ol
                       </button>
@@ -390,25 +390,25 @@
                   )}
                   <button
                     onClick={() => { setSayfa("sepet"); setMenuAcik(false); }}
-                    className="block w-full text-left px-4 py-2 text-sm text-blue-500 hover:bg-gray-700"
+                    className="block w-full text-left px-4 py-2 text-sm text-blue-400 hover:bg-gray-700 rounded"
                   >
                     Sepet ({sepet.length})
                   </button>
                   <button
                     onClick={() => { setSayfa("adminGiris"); setMenuAcik(false); }}
-                    className="block w-full text-left px-4 py-2 text-sm text-purple-500 hover:bg-gray-700"
+                    className="block w-full text-left px-4 py-2 text-sm text-purple-400 hover:bg-gray-700 rounded"
                   >
                     Admin Paneli
                   </button>
                 </div>
               )}
-              <div className="hidden md:flex md:items-center md:space-x-2">
+              <div className="hidden md:flex md:items-center md:space-x-3">
                 {kullanici ? (
                   <>
-                    <span>Hoş geldin, {kullanici.email} ({isim})</span>
+                    <span className="text-sm">Hoş geldin, {kullanici.email} ({isim})</span>
                     <button
                       onClick={handleCikis}
-                      className="bg-red-500 text-white px-4 py-2 rounded"
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
                     >
                       Çıkış Yap
                     </button>
@@ -417,13 +417,13 @@
                   <>
                     <button
                       onClick={() => setSayfa("giris")}
-                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                     >
                       Giriş Yap
                     </button>
                     <button
                       onClick={() => setSayfa("kayit")}
-                      className="bg-green-500 text-white px-4 py-2 rounded"
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
                     >
                       Kayıt Ol
                     </button>
@@ -431,13 +431,13 @@
                 )}
                 <button
                   onClick={() => setSayfa("sepet")}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                 >
                   Sepet ({sepet.length})
                 </button>
                 <button
                   onClick={() => setSayfa("adminGiris")}
-                  className="bg-purple-500 text-white px-4 py-2 rounded"
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
                 >
                   Admin Paneli
                 </button>
@@ -445,33 +445,35 @@
             </div>
           </header>
 
-          {hata && <p className="text-red-500 mb-4">{hata}</p>}
+          {hata && (
+            <p className="text-red-400 bg-red-900 bg-opacity-50 p-3 rounded-lg mb-6 animate-pulse">{hata}</p>
+          )}
 
           {sayfa === "urunler" && (
             <div>
               <img
                 src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
                 alt="Site Baneri"
-                className="w-full h-48 object-cover mb-4 rounded"
+                className="w-full h-40 sm:h-56 object-cover mb-6 rounded-lg"
               />
-              <h2 className="text-2xl mb-4">Ürünler</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Ürünler</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {urunlerState
                   .filter((urun) => urun.yayinlandi)
                   .map((urun) => (
-                    <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
+                    <div key={urun.id} className="border border-gray-700 p-4 rounded-lg shadow-lg bg-gray-800 hover:shadow-xl transition">
                       <img
                         src={urun.gorsel}
                         alt={urun.ad}
-                        className="w-full h-40 object-cover mb-2"
+                        className="w-full h-40 object-cover mb-4 rounded"
                       />
-                      <h3 className="text-xl">{urun.ad}</h3>
+                      <h3 className="text-xl font-semibold">{urun.ad}</h3>
                       <p className="text-md text-gray-300">{urun.baslik}</p>
-                      <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
-                      <p className="text-lg">{urun.fiyat} TL</p>
+                      <p className="text-sm text-gray-400 mb-3">{urun.aciklama}</p>
+                      <p className="text-lg font-bold">{urun.fiyat} TL</p>
                       <button
                         onClick={() => sepeteEkle(urun)}
-                        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg mt-3 w-full hover:bg-green-700 transition"
                       >
                         Sepete Ekle
                       </button>
@@ -483,41 +485,43 @@
 
           {sayfa === "sepet" && (
             <div>
-              <h2 className="text-2xl mb-4">Sepet</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Sepet</h2>
               {sepet.length === 0 ? (
-                <p>Sepetiniz boş.</p>
+                <p className="text-gray-400">Sepetiniz boş.</p>
               ) : (
                 <div>
                   {sepet.map((item) => (
                     <div
                       key={item.id}
-                      className="flex justify-between items-center border-b border-gray-600 py-2"
+                      className="flex justify-between items-center border-b border-gray-700 py-3"
                     >
                       <div>
-                        <h3>{item.ad}</h3>
-                        <p>{item.fiyat} TL x {item.adet} = {item.fiyat * item.adet} TL</p>
+                        <h3 className="text-lg">{item.ad}</h3>
+                        <p className="text-gray-400">{item.fiyat} TL x {item.adet} = {item.fiyat * item.adet} TL</p>
                       </div>
                       <button
                         onClick={() => sepettenCikar(item.id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
                       >
                         Kaldır
                       </button>
                     </div>
                   ))}
-                  <p className="text-xl mt-4">Toplam: {toplamFiyat} TL</p>
-                  <button
-                    onClick={() => setSayfa("odeme")}
-                    className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-                  >
-                    Ödeme Yap
-                  </button>
-                  <button
-                    onClick={() => setSayfa("urunler")}
-                    className="bg-gray-500 text-white px-4 py-2 rounded mt-4 ml-2"
-                  >
-                    Geri Dön
-                  </button>
+                  <p className="text-xl font-bold mt-6">Toplam: {toplamFiyat} TL</p>
+                  <div className="mt-6 flex flex-col sm:flex-row sm:space-x-3">
+                    <button
+                      onClick={() => setSayfa("odeme")}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition mb-3 sm:mb-0"
+                    >
+                      Ödeme Yap
+                    </button>
+                    <button
+                      onClick={() => setSayfa("urunler")}
+                      className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                    >
+                      Geri Dön
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -525,14 +529,14 @@
 
           {sayfa === "odeme" && (
             <div>
-              <h2 className="text-2xl mb-4">Ödeme</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800">
-                <p className="text-yellow-400 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Ödeme</h2>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800">
+                <p className="text-yellow-400 mb-4 bg-yellow-900 bg-opacity-50 p-3 rounded">
                   ⚠️ Bu bir demo uygulamasıdır! Lütfen gerçek kredi kartı bilgilerinizi girmeyin. Test için rastgele veriler kullanın.
                 </p>
                 {kartBilgileri && (
-                  <div className="mb-4 p-4 border border-gray-500 rounded bg-gray-700">
-                    <h3 className="text-lg mb-2">Kayıtlı Kart Bilgileri</h3>
+                  <div className="mb-6 p-4 border border-gray-600 rounded-lg bg-gray-700">
+                    <h3 className="text-lg font-semibold mb-2">Kayıtlı Kart Bilgileri</h3>
                     <p>Kart Numarası: {kartBilgileri.kartNumarasi}</p>
                     <p>Ad Soyad: {kartBilgileri.adSoyad}</p>
                     <p>Son Kullanım: {kartBilgileri.sonKullanim}</p>
@@ -540,241 +544,249 @@
                     <p>Kaydedilme Tarihi: {kartBilgileri.timestamp}</p>
                   </div>
                 )}
-                <h3 className="text-xl mb-2">Kredi Kartı Bilgileri</h3>
+                <h3 className="text-xl font-semibold mb-3">Kredi Kartı Bilgileri</h3>
                 <div className="mb-4">
-                  <label className="block mb-1">Kart Numarası</label>
+                  <label className="block mb-1 text-sm">Kart Numarası</label>
                   <input
                     id="kartNumarasi"
                     type="text"
                     placeholder="1234 5678 9012 3456"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Ad Soyad</label>
+                  <label className="block mb-1 text-sm">Ad Soyad</label>
                   <input
                     id="adSoyad"
                     type="text"
                     placeholder="Ad Soyad"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="flex mb-4">
-                  <div className="w-1/2 mr-2">
-                    <label className="block mb-1">Son Kullanım</label>
+                <div className="flex mb-4 space-x-3">
+                  <div className="w-1/2">
+                    <label className="block mb-1 text-sm">Son Kullanım</label>
                     <input
                       id="sonKullanim"
                       type="text"
                       placeholder="AA/YY"
-                      className="border p-2 w-full rounded bg-gray-700 text-white"
+                      className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div className="w-1/2">
-                    <label className="block mb-1">CVV</label>
+                    <label className="block mb-1 text-sm">CVV</label>
                     <input
                       id="cvv"
                       type="text"
                       placeholder="123"
-                      className="border p-2 w-full rounded bg-gray-700 text-white"
+                      className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={() => {
-                    const kartNumarasi = document.getElementById("kartNumarasi").value;
-                    const adSoyad = document.getElementById("adSoyad").value;
-                    const sonKullanim = document.getElementById("sonKullanim").value;
-                    const cvv = document.getElementById("cvv").value;
-                    if (!kartNumarasi || !adSoyad || !sonKullanim || !cvv) {
-                      setHata("Lütfen tüm alanları doldurun!");
-                      return;
-                    }
-                    handleOdeme(kartNumarasi, adSoyad, sonKullanim, cvv);
-                  }}
-                >
-                  Ödemeyi Tamamla
-                </button>
-                <button
-                  onClick={() => setSayfa("sepet")}
-                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
-                >
-                  Geri Dön
-                </button>
+                <div className="flex flex-col sm:flex-row sm:space-x-3">
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition mb-3 sm:mb-0"
+                    onClick={() => {
+                      const kartNumarasi = document.getElementById("kartNumarasi").value;
+                      const adSoyad = document.getElementById("adSoyad").value;
+                      const sonKullanim = document.getElementById("sonKullanim").value;
+                      const cvv = document.getElementById("cvv").value;
+                      if (!kartNumarasi || !adSoyad || !sonKullanim || !cvv) {
+                        setHata("Lütfen tüm alanları doldurun!");
+                        return;
+                      }
+                      handleOdeme(kartNumarasi, adSoyad, sonKullanim, cvv);
+                    }}
+                  >
+                    Ödemeyi Tamamla
+                  </button>
+                  <button
+                    onClick={() => setSayfa("sepet")}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Geri Dön
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
           {sayfa === "giris" && (
             <div>
-              <h2 className="text-2xl mb-4">Giriş Yap</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Giriş Yap</h2>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800">
                 <div className="mb-4">
-                  <label className="block mb-1">E-posta</label>
+                  <label className="block mb-1 text-sm">E-posta</label>
                   <input
                     id="girisEmail"
                     type="email"
                     placeholder="ornek@ornek.com"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Şifre</label>
+                  <label className="block mb-1 text-sm">Şifre</label>
                   <input
                     id="girisSifre"
                     type="password"
                     placeholder="Şifreniz"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <button
-                  onClick={() => {
-                    const email = document.getElementById("girisEmail").value;
-                    const sifre = document.getElementById("girisSifre").value;
-                    handleGiris(email, sifre);
-                  }}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Giriş Yap
-                </button>
-                <button
-                  onClick={() => setSayfa("urunler")}
-                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
-                >
-                  Geri Dön
-                </button>
+                <div className="flex flex-col sm:flex-row sm:space-x-3">
+                  <button
+                    onClick={() => {
+                      const email = document.getElementById("girisEmail").value;
+                      const sifre = document.getElementById("girisSifre").value;
+                      handleGiris(email, sifre);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition mb-3 sm:mb-0"
+                  >
+                    Giriş Yap
+                  </button>
+                  <button
+                    onClick={() => setSayfa("urunler")}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Geri Dön
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
           {sayfa === "kayit" && (
             <div>
-              <h2 className="text-2xl mb-4">Kayıt Ol</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Kayıt Ol</h2>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800">
                 <div className="mb-4">
-                  <label className="block mb-1">E-posta</label>
+                  <label className="block mb-1 text-sm">E-posta</label>
                   <input
                     id="kayitEmail"
                     type="email"
                     placeholder="ornek@ornek.com"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Şifre</label>
+                  <label className="block mb-1 text-sm">Şifre</label>
                   <input
                     id="kayitSifre"
                     type="password"
                     placeholder="Şifreniz"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <button
-                  onClick={() => {
-                    const email = document.getElementById("kayitEmail").value;
-                    const sifre = document.getElementById("kayitSifre").value;
-                    handleKayit(email, sifre);
-                  }}
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                >
-                  Kayıt Ol
-                </button>
-                <button
-                  onClick={() => setSayfa("urunler")}
-                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
-                >
-                  Geri Dön
-                </button>
+                <div className="flex flex-col sm:flex-row sm:space-x-3">
+                  <button
+                    onClick={() => {
+                      const email = document.getElementById("kayitEmail").value;
+                      const sifre = document.getElementById("kayitSifre").value;
+                      handleKayit(email, sifre);
+                    }}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition mb-3 sm:mb-0"
+                  >
+                    Kayıt Ol
+                  </button>
+                  <button
+                    onClick={() => setSayfa("urunler")}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Geri Dön
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
           {sayfa === "adminGiris" && (
             <div>
-              <h2 className="text-2xl mb-4">Admin Paneli Giriş</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Admin Paneli Giriş</h2>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800">
                 <div className="mb-4">
-                  <label className="block mb-1">Şifre</label>
+                  <label className="block mb-1 text-sm">Şifre</label>
                   <input
                     type="password"
                     value={adminSifre}
                     onChange={(e) => setAdminSifre(e.target.value)}
                     placeholder="Şifrenizi girin"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
-                <button
-                  onClick={handleAdminGiris}
-                  className="bg-purple-500 text-white px-4 py-2 rounded"
-                >
-                  Giriş Yap
-                </button>
-                <button
-                  onClick={() => setSayfa("urunler")}
-                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
-                >
-                  Geri Dön
-                </button>
+                <div className="flex flex-col sm:flex-row sm:space-x-3">
+                  <button
+                    onClick={handleAdminGiris}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition mb-3 sm:mb-0"
+                  >
+                    Giriş Yap
+                  </button>
+                  <button
+                    onClick={() => setSayfa("urunler")}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Geri Dön
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
           {sayfa === "admin" && adminGiris && (
             <div>
-              <h2 className="text-2xl mb-4">Admin Paneli</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800 mb-4">
-                <h3 className="text-xl mb-2">Yeni Ürün Ekle</h3>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6">Admin Paneli</h2>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800 mb-6">
+                <h3 className="text-xl font-semibold mb-3">Yeni Ürün Ekle</h3>
                 <div className="mb-4">
-                  <label className="block mb-1">Ürün Adı</label>
+                  <label className="block mb-1 text-sm">Ürün Adı</label>
                   <input
                     type="text"
                     name="ad"
                     value={yeniUrun.ad}
                     onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Fiyat</label>
+                  <label className="block mb-1 text-sm">Fiyat</label>
                   <input
                     type="number"
                     name="fiyat"
                     value={yeniUrun.fiyat}
                     onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Görsel URL</label>
+                  <label className="block mb-1 text-sm">Görsel URL</label>
                   <input
                     type="text"
                     name="gorsel"
                     value={yeniUrun.gorsel}
                     onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Başlık</label>
+                  <label className="block mb-1 text-sm">Başlık</label>
                   <input
                     type="text"
                     name="baslik"
                     value={yeniUrun.baslik}
                     onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block mb-1">Açıklama</label>
+                  <label className="block mb-1 text-sm">Açıklama</label>
                   <textarea
                     name="aciklama"
                     value={yeniUrun.aciklama}
                     onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
+                    className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Yayınla</label>
+                <div className="mb-4 flex items-center">
+                  <label className="block mr-2 text-sm">Yayınla</label>
                   <input
                     type="checkbox"
                     name="yayinlandi"
@@ -782,56 +794,58 @@
                     onChange={handleYeniUrunDegisiklik}
                     className="mr-2"
                   />
-                  <span>Evet, herkes görsün</span>
+                  <span className="text-sm">Evet, herkes görsün</span>
                 </div>
                 <button
                   onClick={handleYeniUrunEkle}
-                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full sm:w-auto"
                 >
                   Ürün Ekle
                 </button>
               </div>
 
-              <h3 className="text-xl mb-2">Ürün Listesi</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <h3 className="text-xl font-semibold mb-3">Ürün Listesi</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {urunlerState.map((urun) => (
-                  <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
+                  <div key={urun.id} className="border border-gray-700 p-4 rounded-lg shadow-lg bg-gray-800 hover:shadow-xl transition">
                     <img
                       src={urun.gorsel}
                       alt={urun.ad}
-                      className="w-full h-40 object-cover mb-2"
+                      className="w-full h-40 object-cover mb-4 rounded"
                     />
-                    <h3 className="text-xl">{urun.ad}</h3>
+                    <h3 className="text-xl font-semibold">{urun.ad}</h3>
                     <p className="text-md text-gray-300">{urun.baslik}</p>
-                    <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
-                    <p className="text-lg">{urun.fiyat} TL</p>
-                    <p className="text-sm text-gray-400 mb-2">Yayınlandı: {urun.yayinlandi ? "Evet" : "Hayır"}</p>
-                    <button
-                      onClick={() => handleUrunDuzenle(urun)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded mt-2 mr-2"
-                    >
-                      Düzenle
-                    </button>
-                    <button
-                      onClick={() => handleUrunSil(urun.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded mt-2"
-                    >
-                      Sil
-                    </button>
+                    <p className="text-sm text-gray-400 mb-3">{urun.aciklama}</p>
+                    <p className="text-lg font-bold">{urun.fiyat} TL</p>
+                    <p className="text-sm text-gray-400 mb-3">Yayınlandı: {urun.yayinlandi ? "Evet" : "Hayır"}</p>
+                    <div className="flex flex-col sm:flex-row sm:space-x-3">
+                      <button
+                        onClick={() => handleUrunDuzenle(urun)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition mb-3 sm:mb-0"
+                      >
+                        Düzenle
+                      </button>
+                      <button
+                        onClick={() => handleUrunSil(urun.id)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                      >
+                        Sil
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="border border-gray-600 p-4 rounded bg-gray-800 mt-4">
-                <h3 className="text-xl mb-2">İşlem Logları</h3>
+              <div className="border border-gray-700 p-6 rounded-lg bg-gray-800 mt-6">
+                <h3 className="text-xl font-semibold mb-3">İşlem Logları</h3>
                 {logYukleniyor ? (
-                  <p>Yükleniyor...</p>
+                  <p className="text-gray-400">Yükleniyor...</p>
                 ) : loglar.length === 0 ? (
-                  <p>Henüz log kaydı yok.</p>
+                  <p className="text-gray-400">Henüz log kaydı yok.</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     {loglar.map((log) => (
-                      <div key={log.id} className="border-b border-gray-600 py-2">
+                      <div key={log.id} className="border-b border-gray-700 py-3">
                         <p><strong>İşlem:</strong> {log.islem}</p>
                         <p><strong>Ürün ID:</strong> {log.urunId}</p>
                         <p><strong>Başlık:</strong> {log.baslik}</p>
@@ -845,66 +859,68 @@
               </div>
 
               {duzenlenenUrun && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl mb-4">Ürün Düzenle</h3>
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                  <div className="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
+                    <h3 className="text-xl font-semibold mb-4">Ürün Düzenle</h3>
                     <div className="mb-4">
-                      <label className="block mb-1">Başlık</label>
+                      <label className="block mb-1 text-sm">Başlık</label>
                       <input
                         type="text"
                         name="baslik"
                         value={duzenlenenUrun.baslik || ""}
                         onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
+                        className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                     <div className="mb-4">
-                      <label className="block mb-1">Açıklama</label>
+                      <label className="block mb-1 text-sm">Açıklama</label>
                       <textarea
                         name="aciklama"
                         value={duzenlenenUrun.aciklama || ""}
                         onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
+                        className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                     <div className="mb-4">
-                      <label className="block mb-1">Yayınla</label>
+                      <label className="block mb-1 text-sm">Yayınla</label>
                       <select
                         name="yayinlandi"
                         value={duzenlenenUrun.yayinlandi}
                         onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
+                        className="border border-gray-600 p-2 w-full rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                       >
                         <option value={true}>Evet, herkes görsün</option>
                         <option value={false}>Hayır, gizli kalsın</option>
                       </select>
                     </div>
-                    <button
-                      onClick={handleKaydet}
-                      className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-                    >
-                      Kaydet
-                    </button>
-                    <button
-                      onClick={() => setDuzenlenenUrun(null)}
-                      className="bg-red-500 text-white px-4 py-2 rounded"
-                    >
-                      İptal
-                    </button>
+                    <div className="flex flex-col sm:flex-row sm:space-x-3">
+                      <button
+                        onClick={handleKaydet}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition mb-3 sm:mb-0"
+                      >
+                        Kaydet
+                      </button>
+                      <button
+                        onClick={() => setDuzenlenenUrun(null)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                      >
+                        İptal
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
               <button
                 onClick={() => { setAdminGiris(false); setSayfa("urunler"); setAdminSifre(""); }}
-                className="bg-gray-500 text-white px-4 py-2 rounded mt-4"
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition mt-6"
               >
                 Çıkış Yap
               </button>
             </div>
           )}
 
-          <footer className="mt-8 text-center">
-            <p>İletişim: Bizi takip et!</p>
+          <footer className="mt-12 text-center">
+            <p className="text-gray-400">İletişim: Bizi takip et!</p>
             <a
               href="https://www.instagram.com/kemal.1905__"
               target="_blank"
