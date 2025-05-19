@@ -32,17 +32,19 @@
     };
 
     // Firebase başlatma
+    let app, auth, db, logsRef;
     try {
-      const app = firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-      const logsRef = db.collection("logs"); // Log koleksiyonu referansı
+      app = firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      logsRef = db.collection("logs");
       console.log("Firebase başlatıldı:", app.name);
     } catch (error) {
       console.error("Firebase başlatma hatası:", error);
+      document.getElementById("root").innerHTML = "Firebase başlatılamadı. Lütfen konsolu kontrol edin.";
     }
 
-    // Ürün verileri (başlık, açıklama ve yayın durumu ile)
+    // Ürün verileri
     const initialUrunler = [
       { id: 1, ad: "Telefon", fiyat: 15000, gorsel: "https://via.placeholder.com/150", baslik: "En Yeni Model", aciklama: "Gelişmiş kamera ve performans özellikleriyle donatılmış akıllı telefon.", yayinlandi: true },
       { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150", baslik: "Hızlı ve Güçlü", aciklama: "Profesyonel işler için ideal yüksek performanslı laptop.", yayinlandi: true },
@@ -56,10 +58,10 @@
         return;
       }
       const logData = {
-        islem: islem, // "ekleme" veya "duzenleme"
+        islem: islem,
         urunId: urun.id,
-        baslik: urun.baslik,
-        aciklama: urun.aciklama,
+        baslik: urun.baslik || "",
+        aciklama: urun.aciklama || "",
         email: kullanici.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       };
@@ -94,22 +96,23 @@
         aciklama: "",
         yayinlandi: false,
       });
-      const [loglar, setLoglar] = React.useState([]); // Loglar için state
+      const [loglar, setLoglar] = React.useState([]);
+      const [logYukleniyor, setLogYukleniyor] = React.useState(false); // Log yükleme durumu
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
         try {
-          const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
             setKullanici(user);
             console.log("Kullanıcı durumu:", user ? user.email : "Giriş yapılmadı");
             if (user) {
-              firebase.firestore().doc(`users/${user.uid}`).onSnapshot((doc) => {
+              db.doc(`users/${user.uid}`).onSnapshot((doc) => {
                 const userData = doc.data();
                 if (userData) {
                   setIsim(userData.isim || "");
                   setKartBilgileri(userData.kartBilgileri || null);
                 } else {
-                  firebase.firestore().doc(`users/${user.uid}`).set({ isim: "" })
+                  db.doc(`users/${user.uid}`).set({ isim: "" })
                     .catch((error) => {
                       console.error("Kullanıcı dokümanı oluşturma hatası:", error);
                       setHata("Kullanıcı verisi oluşturulamadı: " + error.message);
@@ -133,6 +136,8 @@
       // Admin panelinde logları alma
       React.useEffect(() => {
         if (sayfa === "admin" && adminGiris) {
+          setLogYukleniyor(true);
+          console.log("Loglar yükleniyor...");
           const unsubscribe = logsRef
             .orderBy("timestamp", "desc")
             .onSnapshot((snapshot) => {
@@ -141,9 +146,12 @@
                 ...doc.data(),
               }));
               setLoglar(logListesi);
+              setLogYukleniyor(false);
+              console.log("Loglar yüklendi:", logListesi);
             }, (error) => {
               console.error("Log okuma hatası:", error);
               setHata("Loglar yüklenemedi: " + error.message);
+              setLogYukleniyor(false);
             });
           return () => unsubscribe();
         }
@@ -177,11 +185,11 @@
       // Kayıt olma
       const handleKayit = (email, sifre) => {
         try {
-          firebase.auth()
+          auth
             .createUserWithEmailAndPassword(email, sifre)
             .then((userCredential) => {
               const user = userCredential.user;
-              firebase.firestore().doc(`users/${user.uid}`).set({ email: user.email, isim: "" })
+              db.doc(`users/${user.uid}`).set({ email: user.email, isim: "" })
                 .then(() => {
                   setHata("");
                   setSayfa("urunler");
@@ -202,7 +210,7 @@
       // Giriş yapma
       const handleGiris = (email, sifre) => {
         try {
-          firebase.auth()
+          auth
             .signInWithEmailAndPassword(email, sifre)
             .then(() => {
               setHata("");
@@ -220,7 +228,7 @@
       // Çıkış yapma
       const handleCikis = () => {
         try {
-          firebase.auth().signOut().then(() => {
+          auth.signOut().then(() => {
             setSayfa("urunler");
             setIsim("");
             setKartBilgileri(null);
@@ -247,7 +255,7 @@
         };
 
         try {
-          firebase.firestore().doc(`users/${kullanici.uid}`).set(
+          db.doc(`users/${kullanici.uid}`).set(
             { kartBilgileri: kartBilgileri },
             { merge: true }
           ).then(() => {
@@ -282,13 +290,11 @@
           setHata("Lütfen tüm zorunlu alanları doldurun!");
           return;
         }
-        const yeni面ți面 olarak oluşturuyor.
         const yeniId = urunlerState.length ? Math.max(...urunlerState.map(u => u.id)) + 1 : 1;
         const yeniUrunData = { id: yeniId, ...yeniUrun, fiyat: parseFloat(yeniUrun.fiyat), yayinlandi: yeniUrun.yayinlandi };
         setUrunlerState([...urunlerState, yeniUrunData]);
         setYeniUrun({ ad: "", fiyat: "", gorsel: "", baslik: "", aciklama: "", yayinlandi: false });
         setHata("");
-        // Log kaydı oluştur
         logKaydiOlustur("ekleme", yeniUrunData, kullanici);
       };
 
@@ -307,7 +313,6 @@
           setUrunlerState(urunlerState.map((urun) =>
             urun.id === duzenlenenUrun.id ? { ...urun, baslik: duzenlenenUrun.baslik, aciklama: duzenlenenUrun.aciklama, yayinlandi: duzenlenenUrun.yayinlandi } : urun
           ));
-          // Log kaydı oluştur
           logKaydiOlustur("duzenleme", duzenlenenUrun, kullanici);
           setDuzenlenenUrun(null);
         }
@@ -510,8 +515,6 @@
                 <p className="text-yellow-400 mb-4">
                   ⚠️ Bu bir demo uygulamasıdır! Lütfen gerçek kredi kartı bilgilerinizi girmeyin. Test için rastgele veriler kullanın.
                 </p>
-
-                {/* Kayıtlı Kart Bilgileri */}
                 {kartBilgileri && (
                   <div className="mb-4 p-4 border border-gray-500 rounded bg-gray-700">
                     <h3 className="text-lg mb-2">Kayıtlı Kart Bilgileri</h3>
@@ -522,7 +525,6 @@
                     <p>Kaydedilme Tarihi: {kartBilgileri.timestamp}</p>
                   </div>
                 )}
-
                 <h3 className="text-xl mb-2">Kredi Kartı Bilgileri</h3>
                 <div className="mb-4">
                   <label className="block mb-1">Kart Numarası</label>
@@ -805,10 +807,11 @@
                 ))}
               </div>
 
-              {/* Log Kanalı */}
               <div className="border border-gray-600 p-4 rounded bg-gray-800 mt-4">
                 <h3 className="text-xl mb-2">İşlem Logları</h3>
-                {loglar.length === 0 ? (
+                {logYukleniyor ? (
+                  <p>Yükleniyor...</p>
+                ) : loglar.length === 0 ? (
                   <p>Henüz log kaydı yok.</p>
                 ) : (
                   <div className="space-y-2">
@@ -819,7 +822,7 @@
                         <p><strong>Başlık:</strong> {log.baslik}</p>
                         <p><strong>Açıklama:</strong> {log.aciklama}</p>
                         <p><strong>E-posta:</strong> {log.email}</p>
-                        <p><strong>Tarih:</strong> {log.timestamp?.toDate().toLocaleString()}</p>
+                        <p><strong>Tarih:</strong> {log.timestamp?.toDate().toLocaleString() || "Tarih bilgisi eksik"}</p>
                       </div>
                     ))}
                   </div>
@@ -885,7 +888,6 @@
             </div>
           )}
 
-          {/* Footer */}
           <footer className="mt-8 text-center">
             <p>İletişim: Bizi takip et!</p>
             <a
@@ -903,11 +905,13 @@
 
     // React uygulamasını render etme
     try {
+      console.log("React render başlıyor...");
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
       console.log("React uygulaması render edildi");
     } catch (error) {
       console.error("Render hatası:", error);
+      document.getElementById("root").innerHTML = "Uygulama yüklenemedi. Lütfen konsolu kontrol edin.";
     }
   </script>
 </body>
