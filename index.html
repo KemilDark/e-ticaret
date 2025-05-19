@@ -20,20 +20,6 @@
     .dropdown-menu a:hover {
       background-color: #374151;
     }
-    .slide-in {
-      animation: slideIn 0.5s ease-out;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(0); }
-    }
-    .slide-out {
-      animation: slideOut 0.5s ease-in;
-    }
-    @keyframes slideOut {
-      from { transform: translateX(0); }
-      to { transform: translateX(-100%); }
-    }
   </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
@@ -45,50 +31,66 @@
         <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain">
       </div>
       <!-- Hamburger Menu Button -->
-      <button id="hamburger-btn" class="md:hidden focus:outline-none text-white">
+      <button id="hamburger-btn" class="md:hidden text-white focus:outline-none">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
         </svg>
       </button>
-      <!-- Menu Items -->
-      <div id="nav-menu" class="hidden md:flex md:items-center md:space-x-4">
-        <a href="#" class="px-4 hover:underline" onclick="showHome()">Ana Sayfa</a>
-        <a href="#" class="px-4 hover:underline" onclick="showCart()">Sepet (<span id="cart-count">0</span>)</a>
-      </div>
+    </div>
+    <div id="mobile-menu" class="hidden bg-gray-800 text-white p-4 mt-2 rounded">
+      <a href="#home" class="block px-4 py-2 hover:bg-gray-700" onclick="showHome()">Ana Sayfa</a>
+      <a href="#login" class="block px-4 py-2 hover:bg-gray-700" onclick="showLogin()">Giriş Yap</a>
+      <a href="#cart" class="block px-4 py-2 hover:bg-gray-700" onclick="showCart()">Sepet</a>
     </div>
   </nav>
 
-  <!-- Banner -->
-  <div class="container mx-auto mt-6">
-    <div id="home" class="text-center">
-      <h2 class="text-3xl font-bold mb-4">Hoş Geldiniz!</h2>
-      <p class="text-lg text-gray-400 mb-6">En iyi ürünleri keşfetmek için menüyü açın.</p>
-      <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded">
-    </div>
-    <!-- Cart Page -->
-    <div id="cart" class="hidden">
-      <h2 class="text-2xl font-bold mb-4">Sepetiniz</h2>
-      <p>Sepetinizde ürün bulunmamaktadır.</p>
-    </div>
+  <!-- Home -->
+  <div id="home" class="container mx-auto mt-6">
+    <h2 class="text-3xl font-bold mb-4 text-center">Hoş Geldiniz!</h2>
+    <p class="text-lg text-gray-400 mb-6 text-center">En iyi ürünleri keşfetmek için alışverişe başlayın.</p>
+    <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded">
+    <p class="text-center mt-4"><a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-500">Instagram: _kemal1905_</a></p>
+  </div>
+
+  <!-- Login Page -->
+  <div id="login" class="hidden container mx-auto mt-6">
+    <h2 class="text-3xl font-bold mb-4 text-center">Giriş Yap</h2>
+    <form class="bg-gray-800 p-6 rounded shadow-md max-w-sm mx-auto">
+      <div class="mb-4">
+        <label class="block text-gray-400 mb-2">Kullanıcı Adı</label>
+        <input type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Kullanıcı adınızı girin">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-400 mb-2">Şifre</label>
+        <input type="password" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Şifrenizi girin">
+      </div>
+      <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Giriş Yap</button>
+    </form>
   </div>
 
   <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
-    const navMenu = document.getElementById("nav-menu");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const pages = ["home", "login"];
 
     hamburgerBtn.addEventListener("click", () => {
-      navMenu.classList.toggle("hidden");
-      navMenu.classList.toggle("slide-in");
+      mobileMenu.classList.toggle("hidden");
+      pages.forEach(page => document.getElementById(page).classList.add("hidden"));
     });
 
     function showHome() {
+      mobileMenu.classList.add("hidden");
       document.getElementById("home").classList.remove("hidden");
-      document.getElementById("cart").classList.add("hidden");
+    }
+
+    function showLogin() {
+      mobileMenu.classList.add("hidden");
+      document.getElementById("login").classList.remove("hidden");
     }
 
     function showCart() {
-      document.getElementById("home").classList.add("hidden");
-      document.getElementById("cart").classList.remove("hidden");
+      mobileMenu.classList.add("hidden");
+      alert("Sepet henüz hazır değil!");
     }
   </script>
 </body>
