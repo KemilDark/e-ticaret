@@ -56,6 +56,7 @@
       const [kullanici, setKullanici] = React.useState(null);
       const [hata, setHata] = React.useState("");
       const [isim, setIsim] = React.useState("");
+      const [kartBilgileri, setKartBilgileri] = React.useState(null);
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
@@ -66,8 +67,13 @@
             if (user) {
               firebase.database().ref('users/' + user.uid).once('value').then((snapshot) => {
                 const userData = snapshot.val();
-                if (userData) setIsim(userData.isim || "");
+                if (userData) {
+                  setIsim(userData.isim || "");
+                  setKartBilgileri(userData.kartBilgileri || null);
+                }
               });
+            } else {
+              setKartBilgileri(null);
             }
           });
           return () => unsubscribe();
@@ -147,9 +153,39 @@
           firebase.auth().signOut().then(() => {
             setSayfa("urunler");
             setIsim("");
+            setKartBilgileri(null);
           });
         } catch (error) {
           setHata("Çıkış hatası: " + error.message);
+        }
+      };
+
+      // Kredi kartı bilgilerini kaydetme
+      const handleOdeme = (kartNumarasi, adSoyad, sonKullanim, cvv) => {
+        if (!kullanici) {
+          setHata("Kart bilgilerini kaydetmek için önce giriş yapmalısınız!");
+          return;
+        }
+
+        const kartBilgileri = {
+          kartNumarasi,
+          adSoyad,
+          sonKullanim,
+          cvv,
+          timestamp: new Date().toISOString()
+        };
+
+        try {
+          firebase.database().ref('users/' + kullanici.uid + '/kartBilgileri').set(kartBilgileri)
+            .then(() => {
+              setKartBilgileri(kartBilgileri);
+              alert("Ödeme işlemi tamamlandı! (Simülasyon) - Kart bilgileri kaydedildi.");
+            })
+            .catch((error) => {
+              setHata("Kart bilgileri kaydedilemedi: " + error.message);
+            });
+        } catch (error) {
+          setHata("Kart bilgileri kaydedilemedi: " + error.message);
         }
       };
 
@@ -275,10 +311,27 @@
             <div>
               <h2 className="text-2xl mb-4">Ödeme</h2>
               <div className="border border-gray-600 p-4 rounded bg-gray-800">
+                <p className="text-yellow-400 mb-4">
+                  ⚠️ Bu bir demo uygulamasıdır! Lütfen gerçek kredi kartı bilgilerinizi girmeyin. Test için rastgele veriler kullanın.
+                </p>
+
+                {/* Kayıtlı Kart Bilgileri */}
+                {kartBilgileri && (
+                  <div className="mb-4 p-4 border border-gray-500 rounded bg-gray-700">
+                    <h3 className="text-lg mb-2">Kayıtlı Kart Bilgileri</h3>
+                    <p>Kart Numarası: {kartBilgileri.kartNumarasi}</p>
+                    <p>Ad Soyad: {kartBilgileri.adSoyad}</p>
+                    <p>Son Kullanım: {kartBilgileri.sonKullanim}</p>
+                    <p>CVV: {kartBilgileri.cvv}</p>
+                    <p>Kaydedilme Tarihi: {kartBilgileri.timestamp}</p>
+                  </div>
+                )}
+
                 <h3 className="text-xl mb-2">Kredi Kartı Bilgileri</h3>
                 <div className="mb-4">
                   <label className="block mb-1">Kart Numarası</label>
                   <input
+                    id="kartNumarasi"
                     type="text"
                     placeholder="1234 5678 9012 3456"
                     className="border p-2 w-full rounded bg-gray-700 text-white"
@@ -287,6 +340,7 @@
                 <div className="mb-4">
                   <label className="block mb-1">Ad Soyad</label>
                   <input
+                    id="adSoyad"
                     type="text"
                     placeholder="Ad Soyad"
                     className="border p-2 w-full rounded bg-gray-700 text-white"
@@ -296,6 +350,7 @@
                   <div className="w-1/2 mr-2">
                     <label className="block mb-1">Son Kullanım</label>
                     <input
+                      id="sonKullanim"
                       type="text"
                       placeholder="AA/YY"
                       className="border p-2 w-full rounded bg-gray-700 text-white"
@@ -304,6 +359,7 @@
                   <div className="w-1/2">
                     <label className="block mb-1">CVV</label>
                     <input
+                      id="cvv"
                       type="text"
                       placeholder="123"
                       className="border p-2 w-full rounded bg-gray-700 text-white"
@@ -312,7 +368,13 @@
                 </div>
                 <button
                   className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={() => alert("Ödeme işlemi tamamlandı! (Simülasyon)")}
+                  onClick={() => {
+                    const kartNumarasi = document.getElementById("kartNumarasi").value;
+                    const adSoyad = document.getElementById("adSoyad").value;
+                    const sonKullanim = document.getElementById("sonKullanim").value;
+                    const cvv = document.getElementById("cvv").value;
+                    handleOdeme(kartNumarasi, adSoyad, sonKullanim, cvv);
+                  }}
                 >
                   Ödemeyi Tamamla
                 </button>
