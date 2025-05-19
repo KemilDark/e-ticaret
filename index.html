@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Dropdown menü için stil artık gerek yok, çünkü sadece Sepet var */
+  </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
   <!-- Navbar -->
@@ -12,54 +15,77 @@
     <div class="container mx-auto flex justify-between items-center">
       <!-- Sol taraf: Logo ve Hamburger yan yana -->
       <div class="flex items-center space-x-3">
-        <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain" />
-        
+        <img
+          src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg"
+          alt="Mağaza Logosu"
+          class="h-12 w-auto object-contain"
+        />
         <!-- Hamburger Button -->
-        <button id="hamburger-btn" class="text-white focus:outline-none md:hidden">
-          <svg class="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6h16M4 12h16m-7 6h7"></path>
+        <button
+          id="hamburger-btn"
+          class="text-white focus:outline-none md:hidden"
+          aria-label="Menüyü aç"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="white"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
           </svg>
         </button>
       </div>
 
-      <!-- Sağ taraf: Masaüstü menü (Ana Sayfa, Sepet) -->
-      <div id="nav-menu" class="hidden md:flex md:items-center md:space-x-4">
-        <a href="#" class="px-4 hover:underline" onclick="showHome()">Ana Sayfa</a>
-        <a href="#" class="px-4 hover:underline" onclick="showCart()">Sepet (<span id="cart-count">0</span>)</a>
+      <!-- Masaüstü menü (sadece Sepet) -->
+      <div
+        id="nav-menu"
+        class="hidden md:flex md:items-center md:space-x-4"
+      >
+        <a
+          href="#"
+          class="px-4 hover:underline"
+          onclick="showCart(); return false;"
+          >Sepet (<span id="cart-count">0</span>)</a
+        >
       </div>
     </div>
 
-    <!-- Mobil Menü -->
-    <div id="mobile-menu" class="hidden md:hidden bg-gray-800 mt-2 rounded shadow-md p-4 space-y-2 absolute top-16 left-0 right-0 z-20">
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showHome(); toggleMobileMenu()">Ana Sayfa</a>
-
-      <div class="font-semibold px-4 py-2 border-b border-gray-700 text-gray-300">Kategoriler</div>
-
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCategory('Elektronik'); toggleMobileMenu()">Elektronik</a>
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCategory('Giyim'); toggleMobileMenu()">Giyim</a>
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCategory('Ev & Yaşam'); toggleMobileMenu()">Ev & Yaşam</a>
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCategory('Oyun'); toggleMobileMenu()">Oyun</a>
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCategory('Elektronik Ev Eşyaları'); toggleMobileMenu()">Elektronik Ev Eşyaları</a>
-
-      <a href="#" class="block px-4 py-2 hover:bg-gray-700 rounded" onclick="showCart(); toggleMobileMenu()">Sepet (<span id="cart-count">0</span>)</a>
+    <!-- Mobil Menü (sadece Sepet) -->
+    <div
+      id="mobile-menu"
+      class="hidden md:hidden bg-gray-800 mt-2 rounded shadow-md p-4 space-y-2 absolute top-16 left-0 right-0 z-20"
+    >
+      <a
+        href="#"
+        class="block px-4 py-2 hover:bg-gray-700 rounded"
+        onclick="showCart(); toggleMobileMenu(); return false;"
+        >Sepet (<span id="cart-count">0</span>)</a
+      >
     </div>
   </nav>
 
-  <!-- Banner ve İçerikler -->
+  <!-- Banner ve İçerik -->
   <div class="container mx-auto mt-6">
     <div id="home" class="text-center">
       <h2 class="text-3xl font-bold mb-4">Hoş Geldiniz!</h2>
-      <p class="text-lg text-gray-400 mb-6">En iyi ürünleri keşfetmek için kategorilere göz atın.</p>
-      <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded" />
+      <p class="text-lg text-gray-400 mb-6">
+        En iyi ürünleri keşfetmek için Sepet sayfasına gidin.
+      </p>
+      <img
+        src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
+        alt="Mağaza Banner"
+        class="w-full h-64 object-cover rounded"
+      />
     </div>
 
-    <div id="products" class="hidden">
-      <h2 class="text-2xl font-bold mb-4" id="category-title">Ürünler</h2>
-      <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </div>
-
+    <!-- Sepet Sayfası -->
     <div id="cart" class="hidden">
       <h2 class="text-2xl font-bold mb-4">Sepetiniz</h2>
       <p>Sepetinizde ürün bulunmamaktadır.</p>
@@ -70,10 +96,7 @@
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const mobileMenu = document.getElementById("mobile-menu");
     const home = document.getElementById("home");
-    const productsPage = document.getElementById("products");
     const cartPage = document.getElementById("cart");
-    const categoryTitle = document.getElementById("category-title");
-    const productList = document.getElementById("product-list");
 
     function toggleMobileMenu() {
       mobileMenu.classList.toggle("hidden");
@@ -85,54 +108,24 @@
     });
 
     document.addEventListener("click", (e) => {
-      if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+      if (
+        !mobileMenu.contains(e.target) &&
+        !hamburgerBtn.contains(e.target)
+      ) {
         mobileMenu.classList.add("hidden");
       }
     });
 
-    function showHome() {
-      home.classList.remove("hidden");
-      productsPage.classList.add("hidden");
-      cartPage.classList.add("hidden");
-    }
-
-    function showCategory(category) {
-      home.classList.add("hidden");
-      productsPage.classList.remove("hidden");
-      cartPage.classList.add("hidden");
-      categoryTitle.textContent = category;
-      productList.innerHTML = "";
-
-      const filteredProducts = products.filter(p => p.category === category);
-      filteredProducts.forEach(product => {
-        const productDiv = document.createElement("div");
-        productDiv.className = "bg-gray-800 text-gray-200 p-4 rounded shadow-md";
-        productDiv.innerHTML = `
-          <h3 class="text-lg font-semibold">${product.name}</h3>
-          <p>${product.price.toFixed(2)} TL</p>
-        `;
-        productList.appendChild(productDiv);
-      });
-    }
-
     function showCart() {
       home.classList.add("hidden");
-      productsPage.classList.add("hidden");
       cartPage.classList.remove("hidden");
+      // Mobil menüyü kapat
+      mobileMenu.classList.add("hidden");
     }
 
-    // Örnek ürünler
-    const products = [
-      { name: "Akıllı Telefon", category: "Elektronik", price: 3000 },
-      { name: "Bluetooth Kulaklık", category: "Elektronik", price: 250 },
-      { name: "Tişört", category: "Giyim", price: 100 },
-      { name: "Koltuk Takımı", category: "Ev & Yaşam", price: 4000 },
-      { name: "Bilgisayar Oyunu", category: "Oyun", price: 200 },
-      { name: "Mikrodalga Fırın", category: "Elektronik Ev Eşyaları", price: 900 },
-    ];
-
-    // Başlangıçta ana sayfa göster
-    showHome();
+    // Başlangıçta ana sayfa gösterilsin
+    home.classList.remove("hidden");
+    cartPage.classList.add("hidden");
   </script>
 </body>
 </html>
