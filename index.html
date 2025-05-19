@@ -52,17 +52,13 @@
     ];
 
     // Log kaydı oluşturma fonksiyonu
-    const logKaydiOlustur = (islem, urun, kullanici) => {
-      if (!kullanici) {
-        console.error("Log kaydı için kullanıcı girişi gerekli!");
-        return;
-      }
+    const logKaydiOlustur = (islem, urun, kullanici, setHata) => {
       const logData = {
         islem: islem,
         urunId: urun.id,
         baslik: urun.baslik || "",
         aciklama: urun.aciklama || "",
-        email: kullanici.email,
+        email: kullanici ? kullanici.email : "Anonim",
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       };
       logsRef
@@ -72,6 +68,7 @@
         })
         .catch((error) => {
           console.error("Log kaydı hatası:", error);
+          setHata("Log kaydı hatası: " + error.message);
         });
     };
 
@@ -97,7 +94,7 @@
         yayinlandi: false,
       });
       const [loglar, setLoglar] = React.useState([]);
-      const [logYukleniyor, setLogYukleniyor] = React.useState(false); // Log yükleme durumu
+      const [logYukleniyor, setLogYukleniyor] = React.useState(false);
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
@@ -140,22 +137,30 @@
           console.log("Loglar yükleniyor...");
           const unsubscribe = logsRef
             .orderBy("timestamp", "desc")
-            .onSnapshot((snapshot) => {
-              const logListesi = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              setLoglar(logListesi);
-              setLogYukleniyor(false);
-              console.log("Loglar yüklendi:", logListesi);
-            }, (error) => {
-              console.error("Log okuma hatası:", error);
-              setHata("Loglar yüklenemedi: " + error.message);
-              setLogYukleniyor(false);
-            });
+            .onSnapshot(
+              (snapshot) => {
+                const logListesi = snapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+                setLoglar(logListesi);
+                setLogYukleniyor(false);
+                console.log("Loglar yüklendi:", logListesi);
+              },
+              (error) => {
+                console.error("Log okuma hatası:", error);
+                setHata("Loglar yüklenemedi: " + error.message);
+                setLogYukleniyor(false);
+              }
+            );
           return () => unsubscribe();
         }
       }, [sayfa, adminGiris]);
+
+      // Ürün durumunu izleme (hata ayıklama için)
+      React.useEffect(() => {
+        console.log("Güncel urunlerState:", urunlerState);
+      }, [urunlerState]);
 
       // Sepete ürün ekleme
       const sepeteEkle = (urun) => {
@@ -295,12 +300,20 @@
         setUrunlerState([...urunlerState, yeniUrunData]);
         setYeniUrun({ ad: "", fiyat: "", gorsel: "", baslik: "", aciklama: "", yayinlandi: false });
         setHata("");
-        logKaydiOlustur("ekleme", yeniUrunData, kullanici);
+        logKaydiOlustur("ekleme", yeniUrunData, kullanici, setHata);
       };
 
       // Ürün silme
       const handleUrunSil = (urunId) => {
-        setUrunlerState(urunlerState.filter((urun) => urun.id !== urunId));
+        const urun = urunlerState.find((u) => u.id === urunId);
+        if (urun) {
+          setUrunlerState(urunlerState.filter((u) => u.id !== urunId));
+          logKaydiOlustur("silme", urun, kullanici, setHata);
+          console.log(`Ürün silindi: ${urun.ad}, ID: ${urunId}`);
+        } else {
+          console.error(`Ürün bulunamadı: ID: ${urunId}`);
+          setHata("Silinecek ürün bulunamadı!");
+        }
       };
 
       // Ürün düzenleme
@@ -313,7 +326,7 @@
           setUrunlerState(urunlerState.map((urun) =>
             urun.id === duzenlenenUrun.id ? { ...urun, baslik: duzenlenenUrun.baslik, aciklama: duzenlenenUrun.aciklama, yayinlandi: duzenlenenUrun.yayinlandi } : urun
           ));
-          logKaydiOlustur("duzenleme", duzenlenenUrun, kullanici);
+          logKaydiOlustur("duzenleme", duzenlenenUrun, kullanici, setHata);
           setDuzenlenenUrun(null);
         }
       };
@@ -793,13 +806,9 @@
                     <p className="text-sm text-gray-400 mb-2">Yayınlandı: {urun.yayinlandi ? "Evet" : "Hayır"}</p>
                     <button
                       onClick={() => handleUrunDuzenle(urun)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded mt-2 mr-2"
-                    >
-                      Düzenle
-                    </button>
-                    <button
+                      className="bg-blue-500 text-white px-4 py-临时
+                      className="bg-red-500 text-white px-4 py-2 rounded mt-2 mr-2"
                       onClick={() => handleUrunSil(urun.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded mt-2"
                     >
                       Sil
                     </button>
