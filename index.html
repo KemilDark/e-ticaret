@@ -5,86 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background-color: #1f2937;
+      color: #ffffff;
+      border-radius: 0.375rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 10;
+      min-width: 200px;
+      margin-top: 0.5rem;
+    }
+    .dropdown-menu a:hover {
+      background-color: #374151;
+    }
+  </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
-  <nav class="bg-gray-900 text-gray-100 p-4 relative">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <img
-          src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg"
-          alt="Mağaza Logosu"
-          class="h-12 w-auto object-contain"
-        />
-        <button
-          id="hamburger-btn"
-          class="text-white focus:outline-none md:hidden"
-          aria-label="Menüyü aç"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="white"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16m-7 6h7"
-            ></path>
-          </svg>
-        </button>
-      </div>
-      <div
-        id="nav-menu"
-        class="hidden md:flex md:items-center md:space-x-4"
-      >
-        <a href="#" class="px-4 hover:underline" onclick="showHome(); return false;">Ana Sayfa</a>
-        <a href="#" class="px-4 hover:underline" onclick="showCart(); return false;">Sepet (<span id="cart-count">0</span>)</a>
-      </div>
+
+  <!-- Navbar -->
+  <nav class="bg-gray-900 text-gray-100 p-4 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <img src="https://i.pinimg.com/736x/2f/a2/95/2fa295864c72647e66a0d11b5577ce61.jpg" alt="Mağaza Logosu" class="h-12 w-auto object-contain" />
+      <button id="hamburger-btn" class="text-white md:hidden focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
     </div>
 
-    <div
-      id="mobile-menu"
-      class="hidden md:hidden bg-gray-800 mt-2 rounded shadow-md p-4 space-y-2 absolute top-16 left-0 right-0 z-20"
-    >
-      <a
-        href="#"
-        class="block px-4 py-2 hover:bg-gray-700 rounded"
-        onclick="showHome(); toggleMobileMenu(); return false;"
-        >Ana Sayfa</a
-      >
-      <a
-        href="#"
-        class="block px-4 py-2 hover:bg-gray-700 rounded"
-        onclick="showCart(); toggleMobileMenu(); return false;"
-        >Sepet (<span id="cart-count">0</span>)</a
-      >
+    <div id="nav-menu" class="hidden md:flex md:items-center md:space-x-4">
+      <a href="#" class="px-4 hover:underline" onclick="showHome()">Ana Sayfa</a>
+      <a href="#" class="px-4 hover:underline" onclick="showCart()">Sepet (<span id="cart-count">0</span>)</a>
     </div>
   </nav>
 
+  <!-- Hamburger Menü İçeriği (mobilde) -->
+  <div id="mobile-menu" class="hidden bg-gray-900 text-gray-100 p-4 space-y-4 md:hidden">
+    <a href="#" class="block hover:underline" onclick="showHome(); toggleMobileMenu()">Ana Sayfa</a>
+    <a href="#" class="block hover:underline" onclick="showCart(); toggleMobileMenu()">Sepet (<span id="cart-count-mobile">0</span>)</a>
+  </div>
+
+  <!-- Banner -->
   <div class="container mx-auto mt-6">
     <div id="home" class="text-center">
       <h2 class="text-3xl font-bold mb-4">Hoş Geldiniz!</h2>
-      <p class="text-lg text-gray-400 mb-6">
-        En iyi ürünleri keşfetmek için Ana Sayfa ve Sepet’i kullanabilirsiniz.
-      </p>
-      <img
-        src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg"
-        alt="Mağaza Banner"
-        class="w-full h-64 object-cover rounded"
-      />
+      <p class="text-lg text-gray-400 mb-6">En iyi ürünleri keşfetmek için kategorilere göz atın.</p>
+      <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover rounded" />
     </div>
 
+    <!-- Products Page -->
+    <div id="products" class="hidden">
+      <h2 class="text-2xl font-bold mb-4" id="category-title">Ürünler</h2>
+      <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Cart Page -->
     <div id="cart" class="hidden">
       <h2 class="text-2xl font-bold mb-4">Sepetiniz</h2>
       <p>Sepetinizde ürün bulunmamaktadır.</p>
     </div>
   </div>
 
-  <footer class="bg-gray-900 text-gray-400 text-center py-4 mt-12">
-    <p>İletişim: <a href="https://instagram.com/_kemal1905_" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Instagram: _kemal1905_</a></p>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-center py-4 mt-12">
+    <p class="text-white">
+      İletişim: 
+      <a href="https://instagram.com/_kemal1905_" target="_blank" rel="noopener noreferrer" class="text-white hover:underline">
+        Instagram: _kemal1905_
+      </a>
+    </p>
   </footer>
 
   <script>
@@ -92,39 +83,66 @@
     const mobileMenu = document.getElementById("mobile-menu");
     const navMenu = document.getElementById("nav-menu");
     const home = document.getElementById("home");
+    const productsPage = document.getElementById("products");
     const cartPage = document.getElementById("cart");
+    const cartCount = document.getElementById("cart-count");
+    const cartCountMobile = document.getElementById("cart-count-mobile");
+    const productList = document.getElementById("product-list");
+    const categoryTitle = document.getElementById("category-title");
 
-    function toggleMobileMenu() {
-      if (mobileMenu.classList.contains("hidden")) {
-        mobileMenu.classList.remove("hidden");
-        navMenu.classList.add("hidden");
-      } else {
-        mobileMenu.classList.add("hidden");
-        navMenu.classList.remove("hidden");
-      }
-    }
-
-    hamburgerBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleMobileMenu();
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-        mobileMenu.classList.add("hidden");
-        navMenu.classList.remove("hidden");
-      }
-    });
+    // Örnek ürünler
+    const products = [
+      { name: "Ürün 1", category: "Elektronik", price: 1500 },
+      { name: "Ürün 2", category: "Giyim", price: 200 },
+      { name: "Ürün 3", category: "Ev & Yaşam", price: 350 },
+      { name: "Ürün 4", category: "Oyun", price: 1200 },
+    ];
 
     function showHome() {
       home.classList.remove("hidden");
+      productsPage.classList.add("hidden");
       cartPage.classList.add("hidden");
+    }
+
+    function showCategory(category) {
+      home.classList.add("hidden");
+      productsPage.classList.remove("hidden");
+      cartPage.classList.add("hidden");
+      categoryTitle.textContent = category;
+      productList.innerHTML = "";
+
+      const filteredProducts = products.filter(p => p.category === category);
+      filteredProducts.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "bg-gray-800 text-gray-200 p-4 rounded shadow-md";
+        productDiv.innerHTML = `
+          <h3 class="text-lg font-semibold">${product.name}</h3>
+          <p>${product.price.toFixed(2)} TL</p>
+        `;
+        productList.appendChild(productDiv);
+      });
     }
 
     function showCart() {
       home.classList.add("hidden");
+      productsPage.classList.add("hidden");
       cartPage.classList.remove("hidden");
     }
+
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle("hidden");
+    }
+
+    hamburgerBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleMobileMenu();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!mobileMenu.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+        mobileMenu.classList.add("hidden");
+      }
+    });
 
     showHome();
   </script>
