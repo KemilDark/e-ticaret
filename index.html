@@ -14,7 +14,7 @@
   <!-- Firebase CDN (UMD formatında) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div id="root">Yükleniyor...</div>
@@ -28,15 +28,14 @@
       storageBucket: "e-ticaret-74b1c.firebasestorage.app",
       messagingSenderId: "547307588836",
       appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
-      measurementId: "G-GTL1NTV1G1",
-      databaseURL: "https://e-ticaret-74b1c-default-rtdb.europe-west1.firebasedatabase.app"
+      measurementId: "G-GTL1NTV1G1"
     };
 
     // Firebase başlatma
     try {
       const app = firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
-      const database = firebase.database();
+      const db = firebase.firestore();
       console.log("Firebase başlatıldı:", app.name);
     } catch (error) {
       console.error("Firebase başlatma hatası:", error);
@@ -65,12 +64,16 @@
             setKullanici(user);
             console.log("Kullanıcı durumu:", user ? user.email : "Giriş yapılmadı");
             if (user) {
-              firebase.database().ref('users/' + user.uid).once('value').then((snapshot) => {
-                const userData = snapshot.val();
+              firebase.firestore().doc(`users/${user.uid}`).onSnapshot((doc) => {
+                const userData = doc.data();
                 if (userData) {
                   setIsim(userData.isim || "");
                   setKartBilgileri(userData.kartBilgileri || null);
+                } else {
+                  firebase.firestore().doc(`users/${user.uid}`).set({ isim: "" });
                 }
+              }, (error) => {
+                console.error("Firestore okuma hatası:", error);
               });
             } else {
               setKartBilgileri(null);
@@ -115,10 +118,7 @@
             .createUserWithEmailAndPassword(email, sifre)
             .then((userCredential) => {
               const user = userCredential.user;
-              firebase.database().ref('users/' + user.uid).set({
-                email: user.email,
-                isim: isim
-              });
+              firebase.firestore().doc(`users/${user.uid}`).set({ email: user.email, isim: "" });
               setHata("");
               setSayfa("urunler");
             })
@@ -176,15 +176,19 @@
         };
 
         try {
-          firebase.database().ref('users/' + kullanici.uid + '/kartBilgileri').set(kartBilgileri)
-            .then(() => {
-              setKartBilgileri(kartBilgileri);
-              alert("Ödeme işlemi tamamlandı! (Simülasyon) - Kart bilgileri kaydedildi.");
-            })
-            .catch((error) => {
-              setHata("Kart bilgileri kaydedilemedi: " + error.message);
-            });
+          firebase.firestore().doc(`users/${kullanici.uid}`).set(
+            { kartBilgileri: kartBilgileri },
+            { merge: true }
+          ).then(() => {
+            console.log("Kart bilgileri Firestore'a kaydedildi:", kartBilgileri);
+            setKartBilgileri(kartBilgileri);
+            alert("Ödeme işlemi tamamlandı! (Simülasyon) - Kart bilgileri kaydedildi.");
+          }).catch((error) => {
+            console.error("Firestore yazma hatası:", error);
+            setHata("Kart bilgileri kaydedilemedi: " + error.message);
+          });
         } catch (error) {
+          console.error("Kart bilgileri kaydetme hatası:", error);
           setHata("Kart bilgileri kaydedilemedi: " + error.message);
         }
       };
@@ -373,6 +377,10 @@
                     const adSoyad = document.getElementById("adSoyad").value;
                     const sonKullanim = document.getElementById("sonKullanim").value;
                     const cvv = document.getElementById("cvv").value;
+                    if (!kartNumarasi || !adSoyad || !sonKullanim || !cvv) {
+                      setHata("Lütfen tüm alanları doldurun!");
+                      return;
+                    }
                     handleOdeme(kartNumarasi, adSoyad, sonKullanim, cvv);
                   }}
                 >
