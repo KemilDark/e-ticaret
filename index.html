@@ -5,76 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-Ticaret Sitesi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase App (core SDK) -->
-  <script type="module">
-    // Firebase 9 modüler SDK ile import
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
-      authDomain: "e-ticaret-74b1c.firebaseapp.com",
-      projectId: "e-ticaret-74b1c",
-      storageBucket: "e-ticaret-74b1c.appspot.com",
-      messagingSenderId: "547307588836",
-      appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
-      measurementId: "G-GTL1NTV1G1"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.showRegister = function() {
-      document.getElementById("login-page").classList.add("hidden");
-      document.getElementById("register-page").classList.remove("hidden");
-    };
-
-    window.showLogin = function() {
-      document.getElementById("login-page").classList.remove("hidden");
-      document.getElementById("register-page").classList.add("hidden");
-    };
-
-    window.register = function() {
-      const email = document.getElementById("email-register").value;
-      const password = document.getElementById("password-register").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          alert("Kayıt başarılı! Giriş yapabilirsiniz.");
-          showLogin();
-        })
-        .catch((error) => alert(error.message));
-    };
-
-    window.login = function() {
-      const email = document.getElementById("email-login").value;
-      const password = document.getElementById("password-login").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("auth-container").classList.add("hidden");
-          document.getElementById("site-container").classList.remove("hidden");
-        })
-        .catch((error) => alert(error.message));
-    };
-
-    window.logout = function() {
-      signOut(auth).then(() => {
-        document.getElementById("auth-container").classList.remove("hidden");
-        document.getElementById("site-container").classList.add("hidden");
-      });
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("auth-container").classList.add("hidden");
-        document.getElementById("site-container").classList.remove("hidden");
-      } else {
-        document.getElementById("auth-container").classList.remove("hidden");
-        document.getElementById("site-container").classList.add("hidden");
-      }
-    });
-  </script>
+  <!-- Firebase SDK klasik sürüm -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
   <div id="auth-container" class="container mx-auto mt-6">
@@ -98,5 +31,74 @@
     <h1 class="text-4xl font-bold text-center">E-Ticaret Sitesi</h1>
     <button onclick="logout()" class="bg-red-600 p-2 rounded hover:bg-red-700 mt-4">Çıkış Yap</button>
   </div>
+
+  <script>
+    // Firebase config
+    var firebaseConfig = {
+      apiKey: "AIzaSyDGZ_0sb0XEYY0RbQ3qk_BWToXw0CPt0II",
+      authDomain: "e-ticaret-74b1c.firebaseapp.com",
+      projectId: "e-ticaret-74b1c",
+      storageBucket: "e-ticaret-74b1c.appspot.com",
+      messagingSenderId: "547307588836",
+      appId: "1:547307588836:web:f07b04c5d1b6300efe70f1",
+      measurementId: "G-GTL1NTV1G1"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+
+    function showRegister() {
+      document.getElementById("login-page").classList.add("hidden");
+      document.getElementById("register-page").classList.remove("hidden");
+    }
+
+    function showLogin() {
+      document.getElementById("login-page").classList.remove("hidden");
+      document.getElementById("register-page").classList.add("hidden");
+    }
+
+    function register() {
+      var email = document.getElementById("email-register").value;
+      var password = document.getElementById("password-register").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(function() {
+          alert("Kayıt başarılı! Giriş yapabilirsiniz.");
+          showLogin();
+        })
+        .catch(function(error) {
+          alert(error.message);
+        });
+    }
+
+    function login() {
+      var email = document.getElementById("email-login").value;
+      var password = document.getElementById("password-login").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(function() {
+          document.getElementById("auth-container").classList.add("hidden");
+          document.getElementById("site-container").classList.remove("hidden");
+        })
+        .catch(function(error) {
+          alert(error.message);
+        });
+    }
+
+    function logout() {
+      auth.signOut().then(function() {
+        document.getElementById("auth-container").classList.remove("hidden");
+        document.getElementById("site-container").classList.add("hidden");
+      });
+    }
+
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("site-container").classList.remove("hidden");
+      } else {
+        document.getElementById("auth-container").classList.remove("hidden");
+        document.getElementById("site-container").classList.add("hidden");
+      }
+    });
+  </script>
 </body>
 </html>
