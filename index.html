@@ -22,7 +22,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.registerUser = function() {
+    // Kayıt olma fonksiyonu
+    function registerUser() {
       const email = document.getElementById("register-email").value;
       const password = document.getElementById("register-password").value;
       createUserWithEmailAndPassword(auth, email, password)
@@ -34,7 +35,8 @@
         .catch((error) => alert(error.message));
     }
 
-    window.loginUser = function() {
+    // Giriş yapma fonksiyonu
+    function loginUser() {
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
       signInWithEmailAndPassword(auth, email, password)
@@ -46,6 +48,7 @@
         .catch((error) => alert(error.message));
     }
 
+    // Kullanıcı giriş durumu kontrolü
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById("auth-section").classList.add("hidden");
@@ -55,6 +58,7 @@
   </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
+  <!-- Logo ve Navbar -->
   <header class="bg-black text-white p-4 flex justify-between items-center">
     <div class="flex items-center">
       <img src="https://i.pinimg.com/736x/34/47/a0/3447a0c9bbdf4719e348ca2e5a304ec7.jpg" alt="Logo" class="h-12 w-auto object-contain">
@@ -64,16 +68,14 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
     </button>
-    <nav id="nav-menu" class="hidden md:flex space-x-4">
-      <a href="#home" class="hover:underline" onclick="showHome()">Ana Sayfa</a>
-      <a href="#cart" class="hover:underline" onclick="showCart()">Sepet</a>
-    </nav>
   </header>
 
+  <!-- Banner -->
   <section id="main-section" class="hidden mt-4">
     <img src="https://i.pinimg.com/736x/82/aa/1a/82aa1acfa9c16c0ebe6b48712a84e121.jpg" alt="Mağaza Banner" class="w-full h-64 object-cover">
   </section>
 
+  <!-- Kayıt ve Giriş Formu -->
   <section id="auth-section" class="mt-6 px-4">
     <div class="bg-gray-800 p-6 rounded shadow-md">
       <h2 class="text-2xl mb-4">Kayıt Ol</h2>
@@ -89,11 +91,10 @@
     </div>
   </section>
 
+  <!-- İletişim Bilgisi -->
   <footer class="mt-6 p-4 bg-black text-center">
     <p class="text-white">İletişim:</p>
-    <a href="https://www.instagram.com/_kemal1905_/" target="_blank" class="text-blue-400">_kemal1905_</a>
-    <p class="text-white">İletişim:</p>
-    <a href="mailto:ornek@ornek.com" class="text-blue-400">ornek@ornek.com</a>
+    <a href="https://www.instagram.com/kemal.1905__/" target="_blank" class="text-blue-400">kemal.1905__</a>
   </footer>
 </body>
 </html>
