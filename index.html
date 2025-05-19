@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Ticaret Sitesi</title>
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com" onerror="console.error('Tailwind CSS yüklenemedi');"></script>
   <!-- React ve ReactDOM CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="console.error('React yüklenemedi');"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="console.error('ReactDOM yüklenemedi');"></script>
   <!-- Babel CDN -->
-  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js" onerror="console.error('Babel yüklenemedi');"></script>
   <!-- Firebase CDN (UMD formatında) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="console.error('Firebase App yüklenemedi');"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="console.error('Firebase Auth yüklenemedi');"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="console.error('Firebase Firestore yüklenemedi');"></script>
 </head>
 <body>
   <div id="root">Yükleniyor...</div>
@@ -32,16 +32,17 @@
     };
 
     // Firebase başlatma
+    let app, auth, db;
     try {
-      const app = firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-      console.log("Firebase başlatıldı:", app.name);
+      app = firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
     } catch (error) {
       console.error("Firebase başlatma hatası:", error);
+      document.getElementById("root").innerHTML = "Firebase başlatılamadı. Lütfen konsolu kontrol edin.";
     }
 
-    // Ürün verileri (başlık, açıklama ve yayın durumu ile)
+    // Ürün verileri
     const initialUrunler = [
       { id: 1, ad: "Telefon", fiyat: 15000, gorsel: "https://via.placeholder.com/150", baslik: "En Yeni Model", aciklama: "Gelişmiş kamera ve performans özellikleriyle donatılmış akıllı telefon.", yayinlandi: true },
       { id: 2, ad: "Laptop", fiyat: 30000, gorsel: "https://via.placeholder.com/150", baslik: "Hızlı ve Güçlü", aciklama: "Profesyonel işler için ideal yüksek performanslı laptop.", yayinlandi: true },
@@ -57,40 +58,26 @@
       const [isim, setIsim] = React.useState("");
       const [kartBilgileri, setKartBilgileri] = React.useState(null);
       const [menuAcik, setMenuAcik] = React.useState(false);
-      const [urunlerState, setUrunlerState] = React.useState(initialUrunler);
-      const [duzenlenenUrun, setDuzenlenenUrun] = React.useState(null);
-      const [adminSifre, setAdminSifre] = React.useState("");
-      const [adminGiris, setAdminGiris] = React.useState(false);
-      const [yeniUrun, setYeniUrun] = React.useState({
-        ad: "",
-        fiyat: "",
-        gorsel: "",
-        baslik: "",
-        aciklama: "",
-        yayinlandi: false,
-      });
+      const [urunlerState] = React.useState(initialUrunler);
 
       // Kullanıcı durumunu izleme
       React.useEffect(() => {
         try {
-          const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
             setKullanici(user);
-            console.log("Kullanıcı durumu:", user ? user.email : "Giriş yapılmadı");
             if (user) {
-              firebase.firestore().doc(`users/${user.uid}`).onSnapshot((doc) => {
+              db.doc(`users/${user.uid}`).onSnapshot((doc) => {
                 const userData = doc.data();
                 if (userData) {
                   setIsim(userData.isim || "");
                   setKartBilgileri(userData.kartBilgileri || null);
                 } else {
-                  firebase.firestore().doc(`users/${user.uid}`).set({ isim: "" })
+                  db.doc(`users/${user.uid}`).set({ isim: "" })
                     .catch((error) => {
-                      console.error("Kullanıcı dokümanı oluşturma hatası:", error);
                       setHata("Kullanıcı verisi oluşturulamadı: " + error.message);
                     });
                 }
               }, (error) => {
-                console.error("Firestore okuma hatası:", error);
                 setHata("Veri okuma hatası: " + error.message);
               });
             } else {
@@ -99,7 +86,6 @@
           });
           return () => unsubscribe();
         } catch (error) {
-          console.error("Auth durumu hatası:", error);
           setHata("Kullanıcı durumu alınamadı: " + error.message);
         }
       }, []);
@@ -132,11 +118,11 @@
       // Kayıt olma
       const handleKayit = (email, sifre) => {
         try {
-          firebase.auth()
+          auth
             .createUserWithEmailAndPassword(email, sifre)
             .then((userCredential) => {
               const user = userCredential.user;
-              firebase.firestore().doc(`users/${user.uid}`).set({ email: user.email, isim: "" })
+              db.doc(`users/${user.uid}`).set({ email: user.email, isim: "" })
                 .then(() => {
                   setHata("");
                   setSayfa("urunler");
@@ -147,7 +133,7 @@
                 });
             })
             .catch((error) => {
-              setHata("Kayıt hatası: " + (error.message || "Bilinmeyen hata"));
+              setHata("Kayıt hatası: " + error.message);
             });
         } catch (error) {
           setHata("Kayıt işlemi hatası: " + error.message);
@@ -157,7 +143,7 @@
       // Giriş yapma
       const handleGiris = (email, sifre) => {
         try {
-          firebase.auth()
+          auth
             .signInWithEmailAndPassword(email, sifre)
             .then(() => {
               setHata("");
@@ -165,7 +151,7 @@
               setMenuAcik(false);
             })
             .catch((error) => {
-              setHata("Giriş hatası: " + (error.message || "Bilinmeyen hata"));
+              setHata("Giriş hatası: " + error.message);
             });
         } catch (error) {
           setHata("Giriş işlemi hatası: " + error.message);
@@ -175,7 +161,7 @@
       // Çıkış yapma
       const handleCikis = () => {
         try {
-          firebase.auth().signOut().then(() => {
+          auth.signOut().then(() => {
             setSayfa("urunler");
             setIsim("");
             setKartBilgileri(null);
@@ -202,74 +188,18 @@
         };
 
         try {
-          firebase.firestore().doc(`users/${kullanici.uid}`).set(
+          db.doc(`users/${kullanici.uid}`).set(
             { kartBilgileri: kartBilgileri },
             { merge: true }
           ).then(() => {
-            console.log("Kart bilgileri Firestore'a kaydedildi:", kartBilgileri);
             setKartBilgileri(kartBilgileri);
             alert("Ödeme işlemi tamamlandı! (Simülasyon) - Kart bilgileri kaydedildi.");
           }).catch((error) => {
-            console.error("Firestore yazma hatası:", error);
             setHata("Kart bilgileri kaydedilemedi: " + error.message);
           });
         } catch (error) {
-          console.error("Kart bilgileri kaydetme hatası:", error);
           setHata("Kart bilgileri kaydedilemedi: " + error.message);
         }
-      };
-
-      // Admin şifre kontrolü
-      const handleAdminGiris = () => {
-        if (adminSifre === "admin123") {
-          setAdminGiris(true);
-          setHata("");
-          setSayfa("admin");
-          setMenuAcik(false);
-        } else {
-          setHata("Yanlış şifre! Lütfen tekrar deneyin.");
-        }
-      };
-
-      // Ürün ekleme
-      const handleYeniUrunEkle = () => {
-        if (!yeniUrun.ad || !yeniUrun.fiyat || !yeniUrun.gorsel) {
-          setHata("Lütfen tüm zorunlu alanları doldurun!");
-          return;
-        }
-        const yeniId = urunlerState.length ? Math.max(...urunlerState.map(u => u.id)) + 1 : 1;
-        setUrunlerState([...urunlerState, { id: yeniId, ...yeniUrun, fiyat: parseFloat(yeniUrun.fiyat), yayinlandi: yeniUrun.yayinlandi }]);
-        setYeniUrun({ ad: "", fiyat: "", gorsel: "", baslik: "", aciklama: "", yayinlandi: false });
-        setHata("");
-      };
-
-      // Ürün silme
-      const handleUrunSil = (urunId) => {
-        setUrunlerState(urunlerState.filter((urun) => urun.id !== urunId));
-      };
-
-      // Ürün düzenleme
-      const handleUrunDuzenle = (urun) => {
-        setDuzenlenenUrun({ ...urun });
-      };
-
-      const handleKaydet = () => {
-        if (duzenlenenUrun) {
-          setUrunlerState(urunlerState.map((urun) =>
-            urun.id === duzenlenenUrun.id ? { ...urun, baslik: duzenlenenUrun.baslik, aciklama: duzenlenenUrun.aciklama, yayinlandi: duzenlenenUrun.yayinlandi } : urun
-          ));
-          setDuzenlenenUrun(null);
-        }
-      };
-
-      const handleDegisiklik = (e) => {
-        const { name, value } = e.target;
-        setDuzenlenenUrun({ ...duzenlenenUrun, [name]: name === "yayinlandi" ? value === "true" : value });
-      };
-
-      const handleYeniUrunDegisiklik = (e) => {
-        const { name, value, type, checked } = e.target;
-        setYeniUrun({ ...yeniUrun, [name]: type === "checkbox" ? checked : value });
       };
 
       return (
@@ -323,12 +253,6 @@
                   >
                     Sepet ({sepet.length})
                   </button>
-                  <button
-                    onClick={() => { setSayfa("adminGiris"); setMenuAcik(false); }}
-                    className="block w-full text-left px-4 py-2 text-sm text-purple-500 hover:bg-gray-700"
-                  >
-                    Admin Paneli
-                  </button>
                 </div>
               )}
               <div className="hidden md:flex md:items-center md:space-x-2">
@@ -364,12 +288,6 @@
                 >
                   Sepet ({sepet.length})
                 </button>
-                <button
-                  onClick={() => setSayfa("adminGiris")}
-                  className="bg-purple-500 text-white px-4 py-2 rounded"
-                >
-                  Admin Paneli
-                </button>
               </div>
             </div>
           </header>
@@ -384,29 +302,33 @@
                 className="w-full h-48 object-cover mb-4 rounded"
               />
               <h2 className="text-2xl mb-4">Ürünler</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {urunlerState
-                  .filter((urun) => urun.yayinlandi)
-                  .map((urun) => (
-                    <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
-                      <img
-                        src={urun.gorsel}
-                        alt={urun.ad}
-                        className="w-full h-40 object-cover mb-2"
-                      />
-                      <h3 className="text-xl">{urun.ad}</h3>
-                      <p className="text-md text-gray-300">{urun.baslik}</p>
-                      <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
-                      <p className="text-lg">{urun.fiyat} TL</p>
-                      <button
-                        onClick={() => sepeteEkle(urun)}
-                        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
-                      >
-                        Sepete Ekle
-                      </button>
-                    </div>
-                  ))}
-              </div>
+              {urunlerState.length === 0 ? (
+                <p className="text-gray-400">Ürün bulunamadı.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {urunlerState
+                    .filter((urun) => urun.yayinlandi)
+                    .map((urun) => (
+                      <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
+                        <img
+                          src={urun.gorsel}
+                          alt={urun.ad}
+                          className="w-full h-40 object-cover mb-2"
+                        />
+                        <h3 className="text-xl">{urun.ad}</h3>
+                        <p className="text-md text-gray-300">{urun.baslik}</p>
+                        <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
+                        <p className="text-lg">{urun.fiyat} TL</p>
+                        <button
+                          onClick={() => sepeteEkle(urun)}
+                          className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                        >
+                          Sepete Ekle
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -459,8 +381,6 @@
                 <p className="text-yellow-400 mb-4">
                   ⚠️ Bu bir demo uygulamasıdır! Lütfen gerçek kredi kartı bilgilerinizi girmeyin. Test için rastgele veriler kullanın.
                 </p>
-
-                {/* Kayıtlı Kart Bilgileri */}
                 {kartBilgileri && (
                   <div className="mb-4 p-4 border border-gray-500 rounded bg-gray-700">
                     <h3 className="text-lg mb-2">Kayıtlı Kart Bilgileri</h3>
@@ -471,7 +391,6 @@
                     <p>Kaydedilme Tarihi: {kartBilgileri.timestamp}</p>
                   </div>
                 )}
-
                 <h3 className="text-xl mb-2">Kredi Kartı Bilgileri</h3>
                 <div className="mb-4">
                   <label className="block mb-1">Kart Numarası</label>
@@ -621,198 +540,6 @@
             </div>
           )}
 
-          {sayfa === "adminGiris" && (
-            <div>
-              <h2 className="text-2xl mb-4">Admin Paneli Giriş</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800">
-                <div className="mb-4">
-                  <label className="block mb-1">Şifre</label>
-                  <input
-                    type="password"
-                    value={adminSifre}
-                    onChange={(e) => setAdminSifre(e.target.value)}
-                    placeholder="Şifrenizi girin"
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <button
-                  onClick={handleAdminGiris}
-                  className="bg-purple-500 text-white px-4 py-2 rounded"
-                >
-                  Giriş Yap
-                </button>
-                <button
-                  onClick={() => setSayfa("urunler")}
-                  className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
-                >
-                  Geri Dön
-                </button>
-              </div>
-            </div>
-          )}
-
-          {sayfa === "admin" && adminGiris && (
-            <div>
-              <h2 className="text-2xl mb-4">Admin Paneli</h2>
-              <div className="border border-gray-600 p-4 rounded bg-gray-800 mb-4">
-                <h3 className="text-xl mb-2">Yeni Ürün Ekle</h3>
-                <div className="mb-4">
-                  <label className="block mb-1">Ürün Adı</label>
-                  <input
-                    type="text"
-                    name="ad"
-                    value={yeniUrun.ad}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Fiyat</label>
-                  <input
-                    type="number"
-                    name="fiyat"
-                    value={yeniUrun.fiyat}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Görsel URL</label>
-                  <input
-                    type="text"
-                    name="gorsel"
-                    value={yeniUrun.gorsel}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Başlık</label>
-                  <input
-                    type="text"
-                    name="baslik"
-                    value={yeniUrun.baslik}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Açıklama</label>
-                  <textarea
-                    name="aciklama"
-                    value={yeniUrun.aciklama}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="border p-2 w-full rounded bg-gray-700 text-white"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Yayınla</label>
-                  <input
-                    type="checkbox"
-                    name="yayinlandi"
-                    checked={yeniUrun.yayinlandi}
-                    onChange={handleYeniUrunDegisiklik}
-                    className="mr-2"
-                  />
-                  <span>Evet, herkes görsün</span>
-                </div>
-                <button
-                  onClick={handleYeniUrunEkle}
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                >
-                  Ürün Ekle
-                </button>
-              </div>
-
-              <h3 className="text-xl mb-2">Ürün Listesi</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {urunlerState.map((urun) => (
-                  <div key={urun.id} className="border p-4 rounded shadow bg-gray-800">
-                    <img
-                      src={urun.gorsel}
-                      alt={urun.ad}
-                      className="w-full h-40 object-cover mb-2"
-                    />
-                    <h3 className="text-xl">{urun.ad}</h3>
-                    <p className="text-md text-gray-300">{urun.baslik}</p>
-                    <p className="text-sm text-gray-400 mb-2">{urun.aciklama}</p>
-                    <p className="text-lg">{urun.fiyat} TL</p>
-                    <p className="text-sm text-gray-400 mb-2">Yayınlandı: {urun.yayinlandi ? "Evet" : "Hayır"}</p>
-                    <button
-                      onClick={() => handleUrunDuzenle(urun)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded mt-2 mr-2"
-                    >
-                      Düzenle
-                    </button>
-                    <button
-                      onClick={() => handleUrunSil(urun.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded mt-2"
-                    >
-                      Sil
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {duzenlenenUrun && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h3 className="text-xl mb-4">Ürün Düzenle</h3>
-                    <div className="mb-4">
-                      <label className="block mb-1">Başlık</label>
-                      <input
-                        type="text"
-                        name="baslik"
-                        value={duzenlenenUrun.baslik || ""}
-                        onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block mb-1">Açıklama</label>
-                      <textarea
-                        name="aciklama"
-                        value={duzenlenenUrun.aciklama || ""}
-                        onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block mb-1">Yayınla</label>
-                      <select
-                        name="yayinlandi"
-                        value={duzenlenenUrun.yayinlandi}
-                        onChange={handleDegisiklik}
-                        className="border p-2 w-full rounded bg-gray-700 text-white"
-                      >
-                        <option value={true}>Evet, herkes görsün</option>
-                        <option value={false}>Hayır, gizli kalsın</option>
-                      </select>
-                    </div>
-                    <button
-                      onClick={handleKaydet}
-                      className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-                    >
-                      Kaydet
-                    </button>
-                    <button
-                      onClick={() => setDuzenlenenUrun(null)}
-                      className="bg-red-500 text-white px-4 py-2 rounded"
-                    >
-                      İptal
-                    </button>
-                  </div>
-                </div>
-              )}
-              <button
-                onClick={() => { setAdminGiris(false); setSayfa("urunler"); setAdminSifre(""); }}
-                className="bg-gray-500 text-white px-4 py-2 rounded mt-4"
-              >
-                Çıkış Yap
-              </button>
-            </div>
-          )}
-
-          {/* Footer */}
           <footer className="mt-8 text-center">
             <p>İletişim: Bizi takip et!</p>
             <a
@@ -832,9 +559,9 @@
     try {
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
-      console.log("React uygulaması render edildi");
     } catch (error) {
       console.error("Render hatası:", error);
+      document.getElementById("root").innerHTML = "Uygulama yüklenemedi. Lütfen konsolu kontrol edin.";
     }
   </script>
 </body>
